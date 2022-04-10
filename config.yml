@@ -1,0 +1,56 @@
+baseURL: "https://wglog.net/"
+languageCode: "en-us"
+title: "My Favorite"
+theme: "PaperMod"
+
+taxonomies:
+  tag: tags
+  category: categories
+  series: series
+
+outputs:
+  home:
+    - HTML
+    - RSS
+    - JSON
+
+params:
+  ShowPostNavLinks: true
+  ShowReadingTime: true
+  ShowToc: true
+  ShowShareButtons: true
+  homeInfoParams:
+    Title: Hi, welcome here
+    Content: >
+      - **My Favorite** is a place 🌴 where I write or gather some articles during the process of learning.
+
+      - I will be happy if something in here is also helpful for you 🤗.
+
+  socialIcons:
+    - name: github
+      url: "https://github.com/wgouyang"
+    - name: twitter
+      url: "https://twitter.com/wgouyang"
+
+menu:
+  main:
+    - identifier: archives
+      name: Archive
+      url: /archives/
+      weight: 1
+    - identifier: categories
+      name: Categories
+      url: /categories/
+      weight: 2
+    - identifier: series
+      name: Series
+      url: /series/
+      weight: 3
+    - identifier: tags
+      name: Tags
+      url: /tags/
+      weight: 4
+    - identifier: search
+      name: Search
+      url: /search/
+      weight: 5
