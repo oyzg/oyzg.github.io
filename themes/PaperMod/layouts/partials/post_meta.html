@@ -1,0 +1,21 @@
+{{- $scratch := newScratch}}
+
+{{- if not .Date.IsZero -}}
+{{- $scratch.Add "meta" (slice (.Date.Format (default "January 2, 2006" .Site.Params.DateFormat))) }}
+{{- end -}}
+
+{{- if and (.Param "ShowReadingTime") (gt .ReadingTime 1) -}}
+{{- $scratch.Add "meta" (slice (i18n "read_time" .ReadingTime | default (printf "%s min" .ReadingTime))) }}
+{{- end -}}
+
+{{ with (partial "author.html" . ) }}
+{{ $scratch.Add "meta" (slice .)}}
+{{end}}
+
+{{- with ($scratch.Get "meta")}}
+{{- delimit . "&nbsp;·&nbsp;"}}
+{{- end }}
+
+{{- if isset .Params "affiliatelink" }}
+&nbsp;&nbsp;↗
+{{- end}}
