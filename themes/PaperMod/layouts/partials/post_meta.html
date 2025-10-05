@@ -4,7 +4,7 @@
 {{- $scratch.Add "meta" (slice (.Date.Format (default "January 2, 2006" .Site.Params.DateFormat))) }}
 {{- end -}}
 
-{{- if and (.Param "ShowReadingTime") (gt .ReadingTime 1) -}}
+{{- if and (.Param "ShowReadingTime") (gt .ReadingTime 0) -}}
 {{- $scratch.Add "meta" (slice (i18n "read_time" .ReadingTime | default (printf "%s min" .ReadingTime))) }}
 {{- end -}}
 
@@ -13,7 +13,7 @@
 {{end}}
 
 {{- with ($scratch.Get "meta")}}
-{{- delimit . "&nbsp;·&nbsp;"}}
+{{- delimit . " · "}}
 {{- end }}
 
 {{- if isset .Params "affiliatelink" }}
