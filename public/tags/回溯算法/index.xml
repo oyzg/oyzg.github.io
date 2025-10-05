@@ -1,1 +1,19 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>回溯算法 on My Favorite</title><link>https://oyzg.github.io/tags/%E5%9B%9E%E6%BA%AF%E7%AE%97%E6%B3%95/</link><description>Recent content in 回溯算法 on My Favorite</description><generator>Hugo</generator><language>en-us</language><lastBuildDate>Wed, 25 May 2022 22:42:24 +0800</lastBuildDate><atom:link href="https://oyzg.github.io/tags/%E5%9B%9E%E6%BA%AF%E7%AE%97%E6%B3%95/index.xml" rel="self" type="application/rss+xml"/><item><title>回溯算法</title><link>https://oyzg.github.io/archives/%E5%9B%9E%E6%BA%AF%E7%AE%97%E6%B3%95/</link><pubDate>Wed, 25 May 2022 22:42:24 +0800</pubDate><guid>https://oyzg.github.io/archives/%E5%9B%9E%E6%BA%AF%E7%AE%97%E6%B3%95/</guid><description>回溯算法相关.</description></item></channel></rss>
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>回溯算法 on oyzg&#39;s note</title>
+    <link>http://localhost:1313/tags/%E5%9B%9E%E6%BA%AF%E7%AE%97%E6%B3%95/</link>
+    <description>Recent content in 回溯算法 on oyzg&#39;s note</description>
+    <generator>Hugo</generator>
+    <language>en-us</language>
+    <lastBuildDate>Wed, 25 May 2022 22:42:24 +0800</lastBuildDate>
+    <atom:link href="http://localhost:1313/tags/%E5%9B%9E%E6%BA%AF%E7%AE%97%E6%B3%95/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>回溯算法</title>
+      <link>http://localhost:1313/archives/%E5%9B%9E%E6%BA%AF%E7%AE%97%E6%B3%95/</link>
+      <pubDate>Wed, 25 May 2022 22:42:24 +0800</pubDate>
+      <guid>http://localhost:1313/archives/%E5%9B%9E%E6%BA%AF%E7%AE%97%E6%B3%95/</guid>
+      <description>回溯算法相关.</description>
+    </item>
+  </channel>
+</rss>

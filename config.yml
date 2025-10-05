@@ -1,6 +1,6 @@
 baseURL: "https://oyzg.github.io/"
 languageCode: "en-us"
-title: "My Favorite"
+title: "oyzg's note"
 theme: "PaperMod"
 
 taxonomies:
@@ -22,7 +22,7 @@ params:
   homeInfoParams:
     Title: Hi, welcome here
     Content: >
-      - **My Favorite** is a place 🌴 where I write or gather some articles during the process of learning.
+      - **oyzg's note** is a place 🌴 where I write or gather some articles during the process of learning.
 
       - I will be happy if something in here is also helpful for you 🤗.
 

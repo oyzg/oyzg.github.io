@@ -1,1 +1,19 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>MySQL on My Favorite</title><link>https://oyzg.github.io/tags/mysql/</link><description>Recent content in MySQL on My Favorite</description><generator>Hugo</generator><language>en-us</language><lastBuildDate>Fri, 22 Apr 2022 18:36:14 +0800</lastBuildDate><atom:link href="https://oyzg.github.io/tags/mysql/index.xml" rel="self" type="application/rss+xml"/><item><title>MySQL</title><link>https://oyzg.github.io/archives/mysql/</link><pubDate>Fri, 22 Apr 2022 18:36:14 +0800</pubDate><guid>https://oyzg.github.io/archives/mysql/</guid><description>MySQL面试相关内容.</description></item></channel></rss>
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>MySQL on oyzg&#39;s note</title>
+    <link>http://localhost:1313/tags/mysql/</link>
+    <description>Recent content in MySQL on oyzg&#39;s note</description>
+    <generator>Hugo</generator>
+    <language>en-us</language>
+    <lastBuildDate>Fri, 22 Apr 2022 18:36:14 +0800</lastBuildDate>
+    <atom:link href="http://localhost:1313/tags/mysql/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>MySQL</title>
+      <link>http://localhost:1313/archives/mysql/</link>
+      <pubDate>Fri, 22 Apr 2022 18:36:14 +0800</pubDate>
+      <guid>http://localhost:1313/archives/mysql/</guid>
+      <description>MySQL面试相关内容.</description>
+    </item>
+  </channel>
+</rss>

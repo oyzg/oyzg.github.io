@@ -1,1 +1,19 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>栈 on My Favorite</title><link>https://oyzg.github.io/tags/%E6%A0%88/</link><description>Recent content in 栈 on My Favorite</description><generator>Hugo</generator><language>en-us</language><lastBuildDate>Fri, 20 May 2022 20:55:04 +0800</lastBuildDate><atom:link href="https://oyzg.github.io/tags/%E6%A0%88/index.xml" rel="self" type="application/rss+xml"/><item><title>栈和队列</title><link>https://oyzg.github.io/archives/%E6%A0%88%E5%92%8C%E9%98%9F%E5%88%97/</link><pubDate>Fri, 20 May 2022 20:55:04 +0800</pubDate><guid>https://oyzg.github.io/archives/%E6%A0%88%E5%92%8C%E9%98%9F%E5%88%97/</guid><description>数组、二分查找、双指针相关.</description></item></channel></rss>
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>栈 on oyzg&#39;s note</title>
+    <link>http://localhost:1313/tags/%E6%A0%88/</link>
+    <description>Recent content in 栈 on oyzg&#39;s note</description>
+    <generator>Hugo</generator>
+    <language>en-us</language>
+    <lastBuildDate>Fri, 20 May 2022 20:55:04 +0800</lastBuildDate>
+    <atom:link href="http://localhost:1313/tags/%E6%A0%88/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>栈和队列</title>
+      <link>http://localhost:1313/archives/%E6%A0%88%E5%92%8C%E9%98%9F%E5%88%97/</link>
+      <pubDate>Fri, 20 May 2022 20:55:04 +0800</pubDate>
+      <guid>http://localhost:1313/archives/%E6%A0%88%E5%92%8C%E9%98%9F%E5%88%97/</guid>
+      <description>数组、二分查找、双指针相关.</description>
+    </item>
+  </channel>
+</rss>
