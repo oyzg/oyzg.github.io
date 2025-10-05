@@ -1,0 +1,138 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>My Favorite</title>
+    <link>http://localhost:1313/</link>
+    <description>Recent content on My Favorite</description>
+    <generator>Hugo</generator>
+    <language>en-us</language>
+    <lastBuildDate>Sun, 05 Oct 2025 13:54:14 +0800</lastBuildDate>
+    <atom:link href="http://localhost:1313/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>《认知觉醒》</title>
+      <link>http://localhost:1313/archives/%E8%AE%A4%E7%9F%A5%E8%A7%89%E9%86%92/</link>
+      <pubDate>Sun, 05 Oct 2025 13:54:14 +0800</pubDate>
+      <guid>http://localhost:1313/archives/%E8%AE%A4%E7%9F%A5%E8%A7%89%E9%86%92/</guid>
+      <description>《认知觉醒》读后感.</description>
+    </item>
+    <item>
+      <title>CS186笔记 RookieDB</title>
+      <link>http://localhost:1313/archives/cs186%E7%AC%94%E8%AE%B0-rookiedb/</link>
+      <pubDate>Sun, 26 Jun 2022 17:48:09 +0800</pubDate>
+      <guid>http://localhost:1313/archives/cs186%E7%AC%94%E8%AE%B0-rookiedb/</guid>
+      <description>CS186学习笔记.</description>
+    </item>
+    <item>
+      <title>贪心算法</title>
+      <link>http://localhost:1313/archives/%E8%B4%AA%E5%BF%83%E7%AE%97%E6%B3%95/</link>
+      <pubDate>Sat, 28 May 2022 20:17:52 +0800</pubDate>
+      <guid>http://localhost:1313/archives/%E8%B4%AA%E5%BF%83%E7%AE%97%E6%B3%95/</guid>
+      <description>贪心算法相关.</description>
+    </item>
+    <item>
+      <title>回溯算法</title>
+      <link>http://localhost:1313/archives/%E5%9B%9E%E6%BA%AF%E7%AE%97%E6%B3%95/</link>
+      <pubDate>Wed, 25 May 2022 22:42:24 +0800</pubDate>
+      <guid>http://localhost:1313/archives/%E5%9B%9E%E6%BA%AF%E7%AE%97%E6%B3%95/</guid>
+      <description>回溯算法相关.</description>
+    </item>
+    <item>
+      <title>二叉树</title>
+      <link>http://localhost:1313/archives/%E4%BA%8C%E5%8F%89%E6%A0%91/</link>
+      <pubDate>Sat, 21 May 2022 21:53:39 +0800</pubDate>
+      <guid>http://localhost:1313/archives/%E4%BA%8C%E5%8F%89%E6%A0%91/</guid>
+      <description>二叉树相关.</description>
+    </item>
+    <item>
+      <title>栈和队列</title>
+      <link>http://localhost:1313/archives/%E6%A0%88%E5%92%8C%E9%98%9F%E5%88%97/</link>
+      <pubDate>Fri, 20 May 2022 20:55:04 +0800</pubDate>
+      <guid>http://localhost:1313/archives/%E6%A0%88%E5%92%8C%E9%98%9F%E5%88%97/</guid>
+      <description>数组、二分查找、双指针相关.</description>
+    </item>
+    <item>
+      <title>字符串</title>
+      <link>http://localhost:1313/archives/%E5%AD%97%E7%AC%A6%E4%B8%B2/</link>
+      <pubDate>Sun, 15 May 2022 23:05:37 +0800</pubDate>
+      <guid>http://localhost:1313/archives/%E5%AD%97%E7%AC%A6%E4%B8%B2/</guid>
+      <description>&lt;h1 id=&#34;字符串&#34;&gt;字符串&lt;/h1&gt;&#xA;&lt;p&gt;字符串在不同语言中的差异可能会比较大，所以要想熟练掌握字符串类的算法题，需要对自己所使用的的语言的字符串操作比较熟悉&lt;/p&gt;&#xA;&lt;h2 id=&#34;基础&#34;&gt;基础&lt;/h2&gt;&#xA;&lt;h3 id=&#34;java&#34;&gt;Java&lt;/h3&gt;&#xA;&lt;p&gt;在java中，String是一个类，不是基本数据类型之一，任何字符串都是一个对象，此外字符串在java中是&lt;strong&gt;不可变&lt;/strong&gt;的&lt;/p&gt;&#xA;&lt;p&gt;创建字符串：&lt;/p&gt;&#xA;&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-java&#34; data-lang=&#34;java&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;String s &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;java&amp;#34;&lt;/span&gt;;&lt;span style=&#34;color:#75715e&#34;&gt;// 直接创建的字符串会存储在常量池中&lt;/span&gt;&#xA;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;String s &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#66d9ef&#34;&gt;new&lt;/span&gt; String(&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;java&amp;#34;&lt;/span&gt;); &lt;span style=&#34;color:#75715e&#34;&gt;// new出来的字符串在堆中&lt;/span&gt;&#xA;&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;常用API：&lt;/p&gt;&#xA;&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-java&#34; data-lang=&#34;java&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#66d9ef&#34;&gt;int&lt;/span&gt; n &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; s.&lt;span style=&#34;color:#a6e22e&#34;&gt;length&lt;/span&gt;(); &lt;span style=&#34;color:#75715e&#34;&gt;// 获取字符串长度&lt;/span&gt;&#xA;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#66d9ef&#34;&gt;char&lt;/span&gt; c &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; s.&lt;span style=&#34;color:#a6e22e&#34;&gt;charAt&lt;/span&gt;(i); &lt;span style=&#34;color:#75715e&#34;&gt;// 获取第i个字符&lt;/span&gt;&#xA;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#66d9ef&#34;&gt;boolean&lt;/span&gt; result &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; s1.&lt;span style=&#34;color:#a6e22e&#34;&gt;equals&lt;/span&gt;(s2); &lt;span style=&#34;color:#75715e&#34;&gt;//比较两个字符串的内容是否相同&lt;/span&gt;&#xA;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#66d9ef&#34;&gt;int&lt;/span&gt; i &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; s.&lt;span style=&#34;color:#a6e22e&#34;&gt;indexOf&lt;/span&gt;(c); &lt;span style=&#34;color:#75715e&#34;&gt;// 获取某个字符在字符串中的第一个位置&lt;/span&gt;&#xA;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#66d9ef&#34;&gt;boolean&lt;/span&gt; flag &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; s.&lt;span style=&#34;color:#a6e22e&#34;&gt;IsEmpty&lt;/span&gt;(); &lt;span style=&#34;color:#75715e&#34;&gt;// 判断字符串长度是否为0，为空报错&lt;/span&gt;&#xA;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#66d9ef&#34;&gt;boolean&lt;/span&gt; flag &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; s.&lt;span style=&#34;color:#a6e22e&#34;&gt;isblank&lt;/span&gt;(); &lt;span style=&#34;color:#75715e&#34;&gt;// 判断字符串是否为空，为null返回true&lt;/span&gt;&#xA;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;String s &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; s.&lt;span style=&#34;color:#a6e22e&#34;&gt;replace&lt;/span&gt;(oldchar, newchar); &lt;span style=&#34;color:#75715e&#34;&gt;// 用new代替old&lt;/span&gt;&#xA;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;String&lt;span style=&#34;color:#f92672&#34;&gt;[]&lt;/span&gt; ss &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; s.&lt;span style=&#34;color:#a6e22e&#34;&gt;split&lt;/span&gt;(regex); &lt;span style=&#34;color:#75715e&#34;&gt;// 分割字符串&lt;/span&gt;&#xA;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;String sub &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; s.&lt;span style=&#34;color:#a6e22e&#34;&gt;subString&lt;/span&gt;(begin,&lt;span style=&#34;color:#f92672&#34;&gt;[&lt;/span&gt;end&lt;span style=&#34;color:#f92672&#34;&gt;]&lt;/span&gt;); &lt;span style=&#34;color:#75715e&#34;&gt;// 获取子字符串&lt;/span&gt;&#xA;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#66d9ef&#34;&gt;char&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;[]&lt;/span&gt; cs &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; s.&lt;span style=&#34;color:#a6e22e&#34;&gt;toCharArray&lt;/span&gt;(); &lt;span style=&#34;color:#75715e&#34;&gt;// 转换为字符数组&lt;/span&gt;&#xA;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;String s &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; s.&lt;span style=&#34;color:#a6e22e&#34;&gt;toLowerCase&lt;/span&gt;(); &lt;span style=&#34;color:#75715e&#34;&gt;// 转为小写字符&lt;/span&gt;&#xA;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;String s &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; s.&lt;span style=&#34;color:#a6e22e&#34;&gt;trim&lt;/span&gt;(); &lt;span style=&#34;color:#75715e&#34;&gt;// 去除字符串前后的空格&lt;/span&gt;&#xA;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;String s &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; s.&lt;span style=&#34;color:#a6e22e&#34;&gt;valueOf&lt;/span&gt;(object); &lt;span style=&#34;color:#75715e&#34;&gt;// 将其他类型的对象转换为字符串&lt;/span&gt;&#xA;&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h3 id=&#34;go&#34;&gt;Go&lt;/h3&gt;&#xA;&lt;p&gt;常用操作：&lt;/p&gt;&#xA;&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-go&#34; data-lang=&#34;go&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#a6e22e&#34;&gt;n&lt;/span&gt; &lt;span style=&#34;color:#f92672&#34;&gt;:=&lt;/span&gt; len(&lt;span style=&#34;color:#a6e22e&#34;&gt;s&lt;/span&gt;) &lt;span style=&#34;color:#75715e&#34;&gt;// 获取字符串长度&lt;/span&gt;&#xA;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#a6e22e&#34;&gt;ss&lt;/span&gt; &lt;span style=&#34;color:#f92672&#34;&gt;:=&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;strings&lt;/span&gt;.&lt;span style=&#34;color:#a6e22e&#34;&gt;Split&lt;/span&gt;() &lt;span style=&#34;color:#75715e&#34;&gt;// 分割字符串&lt;/span&gt;&#xA;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#a6e22e&#34;&gt;res&lt;/span&gt; &lt;span style=&#34;color:#f92672&#34;&gt;:=&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;strings&lt;/span&gt;.&lt;span style=&#34;color:#a6e22e&#34;&gt;contains&lt;/span&gt;() &lt;span style=&#34;color:#75715e&#34;&gt;// 判断是否包含&lt;/span&gt;&#xA;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#a6e22e&#34;&gt;fmt&lt;/span&gt;.&lt;span style=&#34;color:#a6e22e&#34;&gt;Sprintf&lt;/span&gt;() &lt;span style=&#34;color:#75715e&#34;&gt;// 拼接字符串&lt;/span&gt;&#xA;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#a6e22e&#34;&gt;i&lt;/span&gt; &lt;span style=&#34;color:#f92672&#34;&gt;:=&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;strings&lt;/span&gt;.&lt;span style=&#34;color:#a6e22e&#34;&gt;Index&lt;/span&gt;() &lt;span style=&#34;color:#75715e&#34;&gt;// 获取某个字符在字符串中的第一个位置&lt;/span&gt;&#xA;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#a6e22e&#34;&gt;c&lt;/span&gt; &lt;span style=&#34;color:#f92672&#34;&gt;:=&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;s&lt;/span&gt;[&lt;span style=&#34;color:#a6e22e&#34;&gt;i&lt;/span&gt;] &lt;span style=&#34;color:#75715e&#34;&gt;// 获取下标为i的字符&lt;/span&gt;&#xA;&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h2 id=&#34;kmp&#34;&gt;KMP&lt;/h2&gt;&#xA;&lt;p&gt;主要思想：&lt;strong&gt;当出现字符串不匹配时，可以知道一部分之前已经匹配的文本内容，可以利用这些信息避免从头再去做匹配了&lt;/strong&gt;&lt;/p&gt;</description>
+    </item>
+    <item>
+      <title>哈希表</title>
+      <link>http://localhost:1313/archives/%E5%93%88%E5%B8%8C%E8%A1%A8/</link>
+      <pubDate>Fri, 13 May 2022 14:59:16 +0800</pubDate>
+      <guid>http://localhost:1313/archives/%E5%93%88%E5%B8%8C%E8%A1%A8/</guid>
+      <description>哈希表相关.</description>
+    </item>
+    <item>
+      <title>链表</title>
+      <link>http://localhost:1313/archives/%E9%93%BE%E8%A1%A8/</link>
+      <pubDate>Wed, 11 May 2022 15:10:01 +0800</pubDate>
+      <guid>http://localhost:1313/archives/%E9%93%BE%E8%A1%A8/</guid>
+      <description>链表相关算法,常考算法题.</description>
+    </item>
+    <item>
+      <title>数组</title>
+      <link>http://localhost:1313/archives/%E6%95%B0%E7%BB%84/</link>
+      <pubDate>Thu, 05 May 2022 22:30:26 +0800</pubDate>
+      <guid>http://localhost:1313/archives/%E6%95%B0%E7%BB%84/</guid>
+      <description>数组、二分查找、双指针相关.</description>
+    </item>
+    <item>
+      <title>算法性能分析</title>
+      <link>http://localhost:1313/archives/%E7%AE%97%E6%B3%95%E6%80%A7%E8%83%BD%E5%88%86%E6%9E%90/</link>
+      <pubDate>Thu, 05 May 2022 14:20:46 +0800</pubDate>
+      <guid>http://localhost:1313/archives/%E7%AE%97%E6%B3%95%E6%80%A7%E8%83%BD%E5%88%86%E6%9E%90/</guid>
+      <description>算法时间复杂度、空间复杂度分析.</description>
+    </item>
+    <item>
+      <title>Redis</title>
+      <link>http://localhost:1313/archives/redis/</link>
+      <pubDate>Fri, 22 Apr 2022 18:36:29 +0800</pubDate>
+      <guid>http://localhost:1313/archives/redis/</guid>
+      <description></description>
+    </item>
+    <item>
+      <title>MySQL</title>
+      <link>http://localhost:1313/archives/mysql/</link>
+      <pubDate>Fri, 22 Apr 2022 18:36:14 +0800</pubDate>
+      <guid>http://localhost:1313/archives/mysql/</guid>
+      <description>MySQL面试相关内容.</description>
+    </item>
+    <item>
+      <title>Linux</title>
+      <link>http://localhost:1313/archives/linux/</link>
+      <pubDate>Fri, 15 Apr 2022 16:41:02 +0800</pubDate>
+      <guid>http://localhost:1313/archives/linux/</guid>
+      <description>Linux面试相关内容.</description>
+    </item>
+    <item>
+      <title>操作系统</title>
+      <link>http://localhost:1313/archives/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/</link>
+      <pubDate>Tue, 12 Apr 2022 16:25:02 +0800</pubDate>
+      <guid>http://localhost:1313/archives/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/</guid>
+      <description>操作系统面试相关内容.</description>
+    </item>
+    <item>
+      <title>计算机网络</title>
+      <link>http://localhost:1313/archives/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C/</link>
+      <pubDate>Sun, 10 Apr 2022 18:06:13 +0800</pubDate>
+      <guid>http://localhost:1313/archives/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C/</guid>
+      <description>计算机网络面试相关内容.</description>
+    </item>
+    <item>
+      <title>Archive</title>
+      <link>http://localhost:1313/archives/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      <guid>http://localhost:1313/archives/</guid>
+      <description>archives</description>
+    </item>
+    <item>
+      <title>Search</title>
+      <link>http://localhost:1313/search/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      <guid>http://localhost:1313/search/</guid>
+      <description>search</description>
+    </item>
+  </channel>
+</rss>
