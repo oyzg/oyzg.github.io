@@ -8,7 +8,6 @@ tags: [运维,Docker,K8s,Kubernetes,云原生]
 summary: "容器编排"
 ---
 
-# 容器
 容器的本质其实就是一个特殊的进程。它通过Linux NameSpace、Linux CGroups、rootfs来实现对进程的隔离和约束。
 
 Docker的核心步骤：
