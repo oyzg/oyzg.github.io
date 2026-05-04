@@ -8,8 +8,6 @@ tags: [SLAM, 3DGS, WildGS-SLAM, Dynamic SLAM]
 summary: "阅读WildGS-SLAM，理解它如何用不确定性建模和DINOv2特征处理动态环境下的单目Gaussian SLAM。"
 ---
 
-# WildGS-SLAM阅读笔记：动态环境下的单目Gaussian SLAM
-
 WildGS-SLAM 提交于 2025-04-04，题目是 *WildGS-SLAM: Monocular Gaussian Splatting SLAM in Dynamic Environments*。这篇论文的背景很好理解：3DGS-SLAM 在静态场景里已经能做比较好的跟踪、建图和渲染，但真实环境往往有动态物体。如果系统还假设整个场景都是静止的，动态物体会同时破坏位姿估计和 Gaussian 地图。
 
 WildGS-SLAM 的目标是做一个面向动态环境的单目 RGB Gaussian SLAM 系统。两个关键词：单目和动态。单目意味着没有真实深度传感器，尺度和几何更难；动态意味着有移动物体，会产生不满足静态世界假设的观测。它的核心思路是引入 uncertainty-aware geometric mapping，用不确定性指导 tracking 和 mapping 中的动态区域处理。

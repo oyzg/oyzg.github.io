@@ -8,8 +8,6 @@ tags: [Agent, Claude Code, Coding Agent, 源码, 工程安全]
 summary: "结合Claude Code源码泄漏事件，重新理解代码Agent的外壳系统：工具组织、权限控制、编辑执行循环和上下文管理。"
 ---
 
-# Claude Code笔记：源码泄漏后再看代码Agent
-
 Claude Code 不是第一个代码 Agent，但它很典型。它在终端里读仓库、改文件、跑命令、根据测试反馈继续修改。2025 年它从 research preview 到 GA，已经说明代码 Agent 从 demo 进入了更实用的工具形态。
 
 源码泄漏事件之后，我更想看的不是“它会不会写代码”，而是代码 Agent 的外壳系统到底怎么组织。因为真正能长期工作的 coding agent，不只是模型强，还要有一整套 harness。

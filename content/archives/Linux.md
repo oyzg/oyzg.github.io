@@ -8,8 +8,6 @@ tags: [操作系统, 面试，Linux]
 summary: "Linux面试相关内容."
 ---
 
-# Linux
-
 
 
 > Linux常用命令

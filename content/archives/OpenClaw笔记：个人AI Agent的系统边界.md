@@ -8,8 +8,6 @@ tags: [Agent, OpenClaw, MCP, Gateway, 安全]
 summary: "整理OpenClaw这类个人Agent框架的系统结构：channel、gateway、tools、skills、MCP bridge和权限边界。"
 ---
 
-# OpenClaw笔记：个人AI Agent的系统边界
-
 这段时间开始注意 OpenClaw。它吸引我的不是单个模型能力，而是它代表的一类个人 AI Agent 形态：Agent 不只是 IDE 里的代码助手，也不只是网页聊天框，而是可以接入聊天渠道、工具、skills、MCP，并长期运行在个人环境里的系统。
 
 这类系统的核心问题不是“能不能回答”，而是“能不能安全地替我做事”。

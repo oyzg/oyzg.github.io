@@ -8,8 +8,6 @@ tags: [SLAM, 4DGS, 3DGS, Dynamic SLAM, Gaussian Splatting]
 summary: "阅读4D Gaussian Splatting SLAM，理解动态场景中为什么需要从静态3D高斯地图扩展到4D高斯表示。"
 ---
 
-# 4DGS-SLAM阅读笔记：从静态高斯地图到动态4D表示
-
 *4D Gaussian Splatting SLAM* 提交于 2025-03-20。先区分两个名字相近的工作：这里主要记录 Yanyan Li 等人的 *4D Gaussian Splatting SLAM*；另一个相关工作是 *Embracing Dynamics: Dynamics-aware 4D Gaussian Splatting SLAM*，也常被简称为 D4DGS-SLAM，提交于 2025-04-07。两者都关注 4DGS 和动态 SLAM，但具体系统设计不同。
 
 很多动态 SLAM 方法会把动态物体当成干扰，先识别再过滤。4DGS-SLAM 的路线更进一步：动态物体不一定只是干扰，它们本来就是场景的一部分。如果希望理解真实世界，就不能永远只建静态背景，也要尝试建模随时间变化的动态场景。

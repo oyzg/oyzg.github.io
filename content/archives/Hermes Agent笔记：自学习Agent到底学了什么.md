@@ -8,8 +8,6 @@ tags: [Agent, Hermes Agent, Skill, Memory, 自学习]
 summary: "阅读Hermes Agent，重点理解它所谓的自学习闭环：从经验生成skill、改进skill、跨会话记忆和用户模型。"
 ---
 
-# Hermes Agent笔记：自学习Agent到底学了什么
-
 Hermes Agent 是 Nous Research 做的开源 Agent。它最吸引我的地方不是 MCP，也不是多工具接入，而是它一直强调 self-improving：Agent 会从经验中创建 skills，在使用中改进 skills，持久化知识，还能搜索过去会话。
 
 这个说法很容易被理解成“模型自己训练自己”。但看下来，我觉得更准确的理解是：Hermes 的自学习主要发生在系统层，不是每次都更新底层模型参数。

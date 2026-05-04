@@ -8,8 +8,6 @@ tags: [SLAM, 3DGS, Gaussian Splatting, 可微渲染]
 summary: "学习3D Gaussian Splatting的基本表示、渲染流程、优化方式，以及它为什么适合被引入SLAM建图。"
 ---
 
-# 3D Gaussian Splatting笔记：从点云到可微渲染
-
 3D Gaussian Splatting，也就是常说的 3DGS。原始 3DGS 论文发表于 2023 年，题目是 *3D Gaussian Splatting for Real-Time Radiance Field Rendering*。它本身不是 SLAM 论文，主要解决新视角合成和实时渲染问题。但它的显式表示和实时渲染能力很适合被拿来做建图，所以先把它的基本表示方式弄清楚。
 
 基本理解：它用一组带有位置、形状、透明度和颜色的三维高斯椭球表示场景，然后通过很快的 splatting 渲染出任意视角图像，再根据渲染图和真实图之间的误差反向优化这些高斯参数。

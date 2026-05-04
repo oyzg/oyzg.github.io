@@ -8,8 +8,6 @@ tags: [Agent, Skill, Claude, Codex, 工作流]
 summary: "整理Skill的基本理解：它和prompt、RAG、MCP的区别，以及为什么适合沉淀可复用任务经验。"
 ---
 
-# Skill笔记：把经验写成可复用的Agent能力
-
 最近看 Agent 工具时，经常看到 Skill 这个概念。Claude 有 Skills，Codex 里也有技能机制，Hermes Agent 也强调从经验里创建和改进 skills。
 
 我现在的理解：Skill 不是简单 prompt，也不是知识库，而是给 Agent 按需加载的一组任务经验。它可以包括说明、约束、脚本、模板、资源和工作流。

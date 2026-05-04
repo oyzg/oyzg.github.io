@@ -8,8 +8,6 @@ tags: [LLM, Transformer, 预训练, 对齐, RLHF]
 summary: "整理LLM的基本训练链路：Transformer、next token prediction、预训练、指令微调和对齐。"
 ---
 
-# LLM基础笔记：Transformer、预训练和对齐
-
 这段时间补 LLM 的基础，发现很多概念如果只看名字会很散：Transformer、预训练、指令微调、RLHF、DPO、上下文学习，好像每个都能单独讲很久。但如果从“一个语言模型怎么从文本预测器变成可用助手”这条线去看，结构会清楚很多。
 
 我先按自己的理解记一遍，不追求把所有细节都写全，重点是把主线搭起来。

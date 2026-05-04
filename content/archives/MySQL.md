@@ -8,8 +8,6 @@ tags: [数据库, 面试, MySQL]
 summary: "MySQL面试相关内容."
 ---
 
-# MySQL
-
 
 
 ## 存储引擎

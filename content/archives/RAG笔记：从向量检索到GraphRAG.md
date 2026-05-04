@@ -8,8 +8,6 @@ tags: [LLM, RAG, GraphRAG, 向量检索, 知识库]
 summary: "整理RAG的工程流程：切分、向量化、召回、重排、上下文拼接、生成和GraphRAG。"
 ---
 
-# RAG笔记：从向量检索到GraphRAG
-
 RAG 的全称是 Retrieval-Augmented Generation。原始 RAG 论文是 2020 年的 *Retrieval-Augmented Generation for Knowledge-Intensive NLP Tasks*。这两年实际做知识库问答时，RAG 已经不只是一个论文方法，更像 LLM 应用里的基础工程模块。
 
 我的理解：RAG 不是为了让模型“更聪明”，而是为了让模型在回答时能拿到外部资料。模型负责理解和组织语言，检索系统负责把相关资料找出来。

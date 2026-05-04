@@ -8,8 +8,6 @@ tags: [数据库, 面试, Redis, 源码]
 summary: "Redis相关内容."
 ---
 
-# Redis
-
 ## 数据结构
 Redis中值是用redisObject保存的,定义如下：
 ```

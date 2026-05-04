@@ -8,8 +8,6 @@ tags: [SLAM, DROID-SLAM, 深度学习, Bundle Adjustment]
 summary: "阅读DROID-SLAM，理解它如何用循环更新和Dense Bundle Adjustment统一单目、双目和RGB-D视觉SLAM。"
 ---
 
-# DROID-SLAM阅读笔记：Dense Bundle Adjustment与深度SLAM
-
 DROID-SLAM 论文提交于 2021-08，题目是 *DROID-SLAM: Deep Visual SLAM for Monocular, Stereo, and RGB-D Cameras*。它把深度学习和几何优化结合得比较紧，不是简单地用网络直接回归位姿，而是把 Dense Bundle Adjustment 放进了系统里。
 
 传统特征点法 SLAM 依赖特征提取、匹配、PnP、BA、回环等模块。DROID-SLAM 没有把几何全扔掉，而是把传统几何优化里的核心结构保留下来，再用神经网络学习更新规则，并把优化做得更稠密。

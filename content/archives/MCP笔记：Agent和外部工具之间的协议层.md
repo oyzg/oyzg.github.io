@@ -8,8 +8,6 @@ tags: [Agent, MCP, Tool Use, Claude, 协议]
 summary: "整理MCP的基本概念：client、server、tools、resources、prompts，以及它为什么适合作为Agent工具协议。"
 ---
 
-# MCP笔记：Agent和外部工具之间的协议层
-
 MCP 是 Model Context Protocol。Anthropic 在 2024-11 发布这个协议，2025 年之后很多 Agent 工具开始接它。补 Agent 系统时，MCP 是绕不开的一层。
 
 我的理解：MCP 不是一个 Agent，也不是一个模型能力，而是模型应用和外部工具之间的协议层。它想解决的问题是：不要让每个 Agent 都为每个工具单独写一套接入方式。
