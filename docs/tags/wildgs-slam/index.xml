@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>WildGS-SLAM on oyzg&#39;s note</title>
+    <link>https://oyzg.github.io/tags/wildgs-slam/</link>
+    <description>Recent content in WildGS-SLAM on oyzg&#39;s note</description>
+    <generator>Hugo</generator>
+    <language>en-us</language>
+    <lastBuildDate>Sat, 12 Apr 2025 20:00:00 +0800</lastBuildDate>
+    <atom:link href="https://oyzg.github.io/tags/wildgs-slam/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>WildGS-SLAM阅读笔记：动态环境下的单目Gaussian SLAM</title>
+      <link>https://oyzg.github.io/archives/wildgs-slam%E9%98%85%E8%AF%BB%E7%AC%94%E8%AE%B0%E5%8A%A8%E6%80%81%E7%8E%AF%E5%A2%83%E4%B8%8B%E7%9A%84%E5%8D%95%E7%9B%AEgaussian-slam/</link>
+      <pubDate>Sat, 12 Apr 2025 20:00:00 +0800</pubDate>
+      <guid>https://oyzg.github.io/archives/wildgs-slam%E9%98%85%E8%AF%BB%E7%AC%94%E8%AE%B0%E5%8A%A8%E6%80%81%E7%8E%AF%E5%A2%83%E4%B8%8B%E7%9A%84%E5%8D%95%E7%9B%AEgaussian-slam/</guid>
+      <description>阅读WildGS-SLAM，理解它如何用不确定性建模和DINOv2特征处理动态环境下的单目Gaussian SLAM。</description>
+    </item>
+  </channel>
+</rss>

@@ -1,1 +1,180 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>oyzg's note</title><link>https://oyzg.github.io/</link><description>Recent content on oyzg's note</description><generator>Hugo</generator><language>en-us</language><lastBuildDate>Sun, 26 Oct 2025 18:36:29 +0800</lastBuildDate><atom:link href="https://oyzg.github.io/index.xml" rel="self" type="application/rss+xml"/><item><title>Redis</title><link>https://oyzg.github.io/archives/redis/</link><pubDate>Sun, 26 Oct 2025 18:36:29 +0800</pubDate><guid>https://oyzg.github.io/archives/redis/</guid><description>Redis相关内容.</description></item><item><title>Kubernetes</title><link>https://oyzg.github.io/archives/kubernetes/</link><pubDate>Wed, 15 Oct 2025 15:35:36 +0800</pubDate><guid>https://oyzg.github.io/archives/kubernetes/</guid><description>容器编排</description></item><item><title>《认知觉醒》</title><link>https://oyzg.github.io/archives/%E8%AE%A4%E7%9F%A5%E8%A7%89%E9%86%92/</link><pubDate>Sun, 05 Oct 2025 13:54:14 +0800</pubDate><guid>https://oyzg.github.io/archives/%E8%AE%A4%E7%9F%A5%E8%A7%89%E9%86%92/</guid><description>不断反思，不断进步</description></item><item><title>CS186笔记 RookieDB</title><link>https://oyzg.github.io/archives/cs186%E7%AC%94%E8%AE%B0-rookiedb/</link><pubDate>Sun, 26 Jun 2022 17:48:09 +0800</pubDate><guid>https://oyzg.github.io/archives/cs186%E7%AC%94%E8%AE%B0-rookiedb/</guid><description>CS186学习笔记.</description></item><item><title>贪心算法</title><link>https://oyzg.github.io/archives/%E8%B4%AA%E5%BF%83%E7%AE%97%E6%B3%95/</link><pubDate>Sat, 28 May 2022 20:17:52 +0800</pubDate><guid>https://oyzg.github.io/archives/%E8%B4%AA%E5%BF%83%E7%AE%97%E6%B3%95/</guid><description>贪心算法相关.</description></item><item><title>回溯算法</title><link>https://oyzg.github.io/archives/%E5%9B%9E%E6%BA%AF%E7%AE%97%E6%B3%95/</link><pubDate>Wed, 25 May 2022 22:42:24 +0800</pubDate><guid>https://oyzg.github.io/archives/%E5%9B%9E%E6%BA%AF%E7%AE%97%E6%B3%95/</guid><description>回溯算法相关.</description></item><item><title>二叉树</title><link>https://oyzg.github.io/archives/%E4%BA%8C%E5%8F%89%E6%A0%91/</link><pubDate>Sat, 21 May 2022 21:53:39 +0800</pubDate><guid>https://oyzg.github.io/archives/%E4%BA%8C%E5%8F%89%E6%A0%91/</guid><description>二叉树相关.</description></item><item><title>栈和队列</title><link>https://oyzg.github.io/archives/%E6%A0%88%E5%92%8C%E9%98%9F%E5%88%97/</link><pubDate>Fri, 20 May 2022 20:55:04 +0800</pubDate><guid>https://oyzg.github.io/archives/%E6%A0%88%E5%92%8C%E9%98%9F%E5%88%97/</guid><description>数组、二分查找、双指针相关.</description></item><item><title>哈希表</title><link>https://oyzg.github.io/archives/%E5%93%88%E5%B8%8C%E8%A1%A8/</link><pubDate>Fri, 13 May 2022 14:59:16 +0800</pubDate><guid>https://oyzg.github.io/archives/%E5%93%88%E5%B8%8C%E8%A1%A8/</guid><description>哈希表相关.</description></item><item><title>链表</title><link>https://oyzg.github.io/archives/%E9%93%BE%E8%A1%A8/</link><pubDate>Wed, 11 May 2022 15:10:01 +0800</pubDate><guid>https://oyzg.github.io/archives/%E9%93%BE%E8%A1%A8/</guid><description>链表相关算法,常考算法题.</description></item><item><title>数组</title><link>https://oyzg.github.io/archives/%E6%95%B0%E7%BB%84/</link><pubDate>Thu, 05 May 2022 22:30:26 +0800</pubDate><guid>https://oyzg.github.io/archives/%E6%95%B0%E7%BB%84/</guid><description>数组、二分查找、双指针相关.</description></item><item><title>算法性能分析</title><link>https://oyzg.github.io/archives/%E7%AE%97%E6%B3%95%E6%80%A7%E8%83%BD%E5%88%86%E6%9E%90/</link><pubDate>Thu, 05 May 2022 14:20:46 +0800</pubDate><guid>https://oyzg.github.io/archives/%E7%AE%97%E6%B3%95%E6%80%A7%E8%83%BD%E5%88%86%E6%9E%90/</guid><description>算法时间复杂度、空间复杂度分析.</description></item><item><title>MySQL</title><link>https://oyzg.github.io/archives/mysql/</link><pubDate>Fri, 22 Apr 2022 18:36:14 +0800</pubDate><guid>https://oyzg.github.io/archives/mysql/</guid><description>MySQL面试相关内容.</description></item><item><title>Linux</title><link>https://oyzg.github.io/archives/linux/</link><pubDate>Fri, 15 Apr 2022 16:41:02 +0800</pubDate><guid>https://oyzg.github.io/archives/linux/</guid><description>Linux面试相关内容.</description></item><item><title>操作系统</title><link>https://oyzg.github.io/archives/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/</link><pubDate>Tue, 12 Apr 2022 16:25:02 +0800</pubDate><guid>https://oyzg.github.io/archives/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/</guid><description>操作系统面试相关内容.</description></item><item><title>计算机网络</title><link>https://oyzg.github.io/archives/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C/</link><pubDate>Sun, 10 Apr 2022 18:06:13 +0800</pubDate><guid>https://oyzg.github.io/archives/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C/</guid><description>计算机网络面试相关内容.</description></item><item><title>Archive</title><link>https://oyzg.github.io/archives/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://oyzg.github.io/archives/</guid><description>archives</description></item><item><title>Search</title><link>https://oyzg.github.io/search/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://oyzg.github.io/search/</guid><description>search</description></item></channel></rss>
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>oyzg&#39;s note</title>
+    <link>https://oyzg.github.io/</link>
+    <description>Recent content on oyzg&#39;s note</description>
+    <generator>Hugo</generator>
+    <language>en-us</language>
+    <lastBuildDate>Sun, 26 Oct 2025 18:36:29 +0800</lastBuildDate>
+    <atom:link href="https://oyzg.github.io/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Redis</title>
+      <link>https://oyzg.github.io/archives/redis/</link>
+      <pubDate>Sun, 26 Oct 2025 18:36:29 +0800</pubDate>
+      <guid>https://oyzg.github.io/archives/redis/</guid>
+      <description>Redis相关内容.</description>
+    </item>
+    <item>
+      <title>消息队列</title>
+      <link>https://oyzg.github.io/archives/%E6%B6%88%E6%81%AF%E9%98%9F%E5%88%97/</link>
+      <pubDate>Sat, 25 Oct 2025 21:58:08 +0800</pubDate>
+      <guid>https://oyzg.github.io/archives/%E6%B6%88%E6%81%AF%E9%98%9F%E5%88%97/</guid>
+      <description>从核心概念、基础模块、客户端模型和主流产品实现几个角度梳理消息队列。</description>
+    </item>
+    <item>
+      <title>Kubernetes</title>
+      <link>https://oyzg.github.io/archives/kubernetes/</link>
+      <pubDate>Wed, 15 Oct 2025 15:35:36 +0800</pubDate>
+      <guid>https://oyzg.github.io/archives/kubernetes/</guid>
+      <description>容器编排</description>
+    </item>
+    <item>
+      <title>《认知觉醒》</title>
+      <link>https://oyzg.github.io/archives/%E8%AE%A4%E7%9F%A5%E8%A7%89%E9%86%92/</link>
+      <pubDate>Sun, 05 Oct 2025 13:54:14 +0800</pubDate>
+      <guid>https://oyzg.github.io/archives/%E8%AE%A4%E7%9F%A5%E8%A7%89%E9%86%92/</guid>
+      <description>不断反思，不断进步</description>
+    </item>
+    <item>
+      <title>4DGS-SLAM阅读笔记：从静态高斯地图到动态4D表示</title>
+      <link>https://oyzg.github.io/archives/4dgs-slam%E9%98%85%E8%AF%BB%E7%AC%94%E8%AE%B0%E4%BB%8E%E9%9D%99%E6%80%81%E9%AB%98%E6%96%AF%E5%9C%B0%E5%9B%BE%E5%88%B0%E5%8A%A8%E6%80%814d%E8%A1%A8%E7%A4%BA/</link>
+      <pubDate>Fri, 25 Apr 2025 20:00:00 +0800</pubDate>
+      <guid>https://oyzg.github.io/archives/4dgs-slam%E9%98%85%E8%AF%BB%E7%AC%94%E8%AE%B0%E4%BB%8E%E9%9D%99%E6%80%81%E9%AB%98%E6%96%AF%E5%9C%B0%E5%9B%BE%E5%88%B0%E5%8A%A8%E6%80%814d%E8%A1%A8%E7%A4%BA/</guid>
+      <description>阅读4D Gaussian Splatting SLAM，理解动态场景中为什么需要从静态3D高斯地图扩展到4D高斯表示。</description>
+    </item>
+    <item>
+      <title>WildGS-SLAM阅读笔记：动态环境下的单目Gaussian SLAM</title>
+      <link>https://oyzg.github.io/archives/wildgs-slam%E9%98%85%E8%AF%BB%E7%AC%94%E8%AE%B0%E5%8A%A8%E6%80%81%E7%8E%AF%E5%A2%83%E4%B8%8B%E7%9A%84%E5%8D%95%E7%9B%AEgaussian-slam/</link>
+      <pubDate>Sat, 12 Apr 2025 20:00:00 +0800</pubDate>
+      <guid>https://oyzg.github.io/archives/wildgs-slam%E9%98%85%E8%AF%BB%E7%AC%94%E8%AE%B0%E5%8A%A8%E6%80%81%E7%8E%AF%E5%A2%83%E4%B8%8B%E7%9A%84%E5%8D%95%E7%9B%AEgaussian-slam/</guid>
+      <description>阅读WildGS-SLAM，理解它如何用不确定性建模和DINOv2特征处理动态环境下的单目Gaussian SLAM。</description>
+    </item>
+    <item>
+      <title>DROID-SLAM阅读笔记：Dense Bundle Adjustment与深度SLAM</title>
+      <link>https://oyzg.github.io/archives/droid-slam%E9%98%85%E8%AF%BB%E7%AC%94%E8%AE%B0dense-bundle-adjustment%E4%B8%8E%E6%B7%B1%E5%BA%A6slam/</link>
+      <pubDate>Sun, 10 Nov 2024 20:00:00 +0800</pubDate>
+      <guid>https://oyzg.github.io/archives/droid-slam%E9%98%85%E8%AF%BB%E7%AC%94%E8%AE%B0dense-bundle-adjustment%E4%B8%8E%E6%B7%B1%E5%BA%A6slam/</guid>
+      <description>阅读DROID-SLAM，理解它如何用循环更新和Dense Bundle Adjustment统一单目、双目和RGB-D视觉SLAM。</description>
+    </item>
+    <item>
+      <title>3D Gaussian Splatting笔记：从点云到可微渲染</title>
+      <link>https://oyzg.github.io/archives/3d-gaussian-splatting%E7%AC%94%E8%AE%B0%E4%BB%8E%E7%82%B9%E4%BA%91%E5%88%B0%E5%8F%AF%E5%BE%AE%E6%B8%B2%E6%9F%93/</link>
+      <pubDate>Sun, 18 Aug 2024 20:00:00 +0800</pubDate>
+      <guid>https://oyzg.github.io/archives/3d-gaussian-splatting%E7%AC%94%E8%AE%B0%E4%BB%8E%E7%82%B9%E4%BA%91%E5%88%B0%E5%8F%AF%E5%BE%AE%E6%B8%B2%E6%9F%93/</guid>
+      <description>学习3D Gaussian Splatting的基本表示、渲染流程、优化方式，以及它为什么适合被引入SLAM建图。</description>
+    </item>
+    <item>
+      <title>传统视觉SLAM笔记：特征点法的基本流程</title>
+      <link>https://oyzg.github.io/archives/%E4%BC%A0%E7%BB%9F%E8%A7%86%E8%A7%89slam%E7%AC%94%E8%AE%B0%E7%89%B9%E5%BE%81%E7%82%B9%E6%B3%95%E7%9A%84%E5%9F%BA%E6%9C%AC%E6%B5%81%E7%A8%8B/</link>
+      <pubDate>Sun, 10 Mar 2024 20:00:00 +0800</pubDate>
+      <guid>https://oyzg.github.io/archives/%E4%BC%A0%E7%BB%9F%E8%A7%86%E8%A7%89slam%E7%AC%94%E8%AE%B0%E7%89%B9%E5%BE%81%E7%82%B9%E6%B3%95%E7%9A%84%E5%9F%BA%E6%9C%AC%E6%B5%81%E7%A8%8B/</guid>
+      <description>梳理传统特征点法视觉SLAM的基本流程：前端跟踪、后端优化、回环检测和建图。</description>
+    </item>
+    <item>
+      <title>CS186笔记 RookieDB</title>
+      <link>https://oyzg.github.io/archives/cs186%E7%AC%94%E8%AE%B0-rookiedb/</link>
+      <pubDate>Sun, 26 Jun 2022 17:48:09 +0800</pubDate>
+      <guid>https://oyzg.github.io/archives/cs186%E7%AC%94%E8%AE%B0-rookiedb/</guid>
+      <description>CS186学习笔记.</description>
+    </item>
+    <item>
+      <title>贪心算法</title>
+      <link>https://oyzg.github.io/archives/%E8%B4%AA%E5%BF%83%E7%AE%97%E6%B3%95/</link>
+      <pubDate>Sat, 28 May 2022 20:17:52 +0800</pubDate>
+      <guid>https://oyzg.github.io/archives/%E8%B4%AA%E5%BF%83%E7%AE%97%E6%B3%95/</guid>
+      <description>贪心算法相关.</description>
+    </item>
+    <item>
+      <title>回溯算法</title>
+      <link>https://oyzg.github.io/archives/%E5%9B%9E%E6%BA%AF%E7%AE%97%E6%B3%95/</link>
+      <pubDate>Wed, 25 May 2022 22:42:24 +0800</pubDate>
+      <guid>https://oyzg.github.io/archives/%E5%9B%9E%E6%BA%AF%E7%AE%97%E6%B3%95/</guid>
+      <description>回溯算法相关.</description>
+    </item>
+    <item>
+      <title>二叉树</title>
+      <link>https://oyzg.github.io/archives/%E4%BA%8C%E5%8F%89%E6%A0%91/</link>
+      <pubDate>Sat, 21 May 2022 21:53:39 +0800</pubDate>
+      <guid>https://oyzg.github.io/archives/%E4%BA%8C%E5%8F%89%E6%A0%91/</guid>
+      <description>二叉树相关.</description>
+    </item>
+    <item>
+      <title>栈和队列</title>
+      <link>https://oyzg.github.io/archives/%E6%A0%88%E5%92%8C%E9%98%9F%E5%88%97/</link>
+      <pubDate>Fri, 20 May 2022 20:55:04 +0800</pubDate>
+      <guid>https://oyzg.github.io/archives/%E6%A0%88%E5%92%8C%E9%98%9F%E5%88%97/</guid>
+      <description>数组、二分查找、双指针相关.</description>
+    </item>
+    <item>
+      <title>哈希表</title>
+      <link>https://oyzg.github.io/archives/%E5%93%88%E5%B8%8C%E8%A1%A8/</link>
+      <pubDate>Fri, 13 May 2022 14:59:16 +0800</pubDate>
+      <guid>https://oyzg.github.io/archives/%E5%93%88%E5%B8%8C%E8%A1%A8/</guid>
+      <description>哈希表相关.</description>
+    </item>
+    <item>
+      <title>链表</title>
+      <link>https://oyzg.github.io/archives/%E9%93%BE%E8%A1%A8/</link>
+      <pubDate>Wed, 11 May 2022 15:10:01 +0800</pubDate>
+      <guid>https://oyzg.github.io/archives/%E9%93%BE%E8%A1%A8/</guid>
+      <description>链表相关算法,常考算法题.</description>
+    </item>
+    <item>
+      <title>数组</title>
+      <link>https://oyzg.github.io/archives/%E6%95%B0%E7%BB%84/</link>
+      <pubDate>Thu, 05 May 2022 22:30:26 +0800</pubDate>
+      <guid>https://oyzg.github.io/archives/%E6%95%B0%E7%BB%84/</guid>
+      <description>数组、二分查找、双指针相关.</description>
+    </item>
+    <item>
+      <title>算法性能分析</title>
+      <link>https://oyzg.github.io/archives/%E7%AE%97%E6%B3%95%E6%80%A7%E8%83%BD%E5%88%86%E6%9E%90/</link>
+      <pubDate>Thu, 05 May 2022 14:20:46 +0800</pubDate>
+      <guid>https://oyzg.github.io/archives/%E7%AE%97%E6%B3%95%E6%80%A7%E8%83%BD%E5%88%86%E6%9E%90/</guid>
+      <description>算法时间复杂度、空间复杂度分析.</description>
+    </item>
+    <item>
+      <title>MySQL</title>
+      <link>https://oyzg.github.io/archives/mysql/</link>
+      <pubDate>Fri, 22 Apr 2022 18:36:14 +0800</pubDate>
+      <guid>https://oyzg.github.io/archives/mysql/</guid>
+      <description>MySQL面试相关内容.</description>
+    </item>
+    <item>
+      <title>Linux</title>
+      <link>https://oyzg.github.io/archives/linux/</link>
+      <pubDate>Fri, 15 Apr 2022 16:41:02 +0800</pubDate>
+      <guid>https://oyzg.github.io/archives/linux/</guid>
+      <description>Linux面试相关内容.</description>
+    </item>
+    <item>
+      <title>操作系统</title>
+      <link>https://oyzg.github.io/archives/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/</link>
+      <pubDate>Tue, 12 Apr 2022 16:25:02 +0800</pubDate>
+      <guid>https://oyzg.github.io/archives/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/</guid>
+      <description>操作系统面试相关内容.</description>
+    </item>
+    <item>
+      <title>计算机网络</title>
+      <link>https://oyzg.github.io/archives/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C/</link>
+      <pubDate>Sun, 10 Apr 2022 18:06:13 +0800</pubDate>
+      <guid>https://oyzg.github.io/archives/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C/</guid>
+      <description>计算机网络面试相关内容.</description>
+    </item>
+    <item>
+      <title>Archive</title>
+      <link>https://oyzg.github.io/archives/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      <guid>https://oyzg.github.io/archives/</guid>
+      <description>archives</description>
+    </item>
+    <item>
+      <title>Search</title>
+      <link>https://oyzg.github.io/search/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      <guid>https://oyzg.github.io/search/</guid>
+      <description>search</description>
+    </item>
+  </channel>
+</rss>

@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>ORB-SLAM on oyzg&#39;s note</title>
+    <link>https://oyzg.github.io/tags/orb-slam/</link>
+    <description>Recent content in ORB-SLAM on oyzg&#39;s note</description>
+    <generator>Hugo</generator>
+    <language>en-us</language>
+    <lastBuildDate>Sun, 10 Mar 2024 20:00:00 +0800</lastBuildDate>
+    <atom:link href="https://oyzg.github.io/tags/orb-slam/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>传统视觉SLAM笔记：特征点法的基本流程</title>
+      <link>https://oyzg.github.io/archives/%E4%BC%A0%E7%BB%9F%E8%A7%86%E8%A7%89slam%E7%AC%94%E8%AE%B0%E7%89%B9%E5%BE%81%E7%82%B9%E6%B3%95%E7%9A%84%E5%9F%BA%E6%9C%AC%E6%B5%81%E7%A8%8B/</link>
+      <pubDate>Sun, 10 Mar 2024 20:00:00 +0800</pubDate>
+      <guid>https://oyzg.github.io/archives/%E4%BC%A0%E7%BB%9F%E8%A7%86%E8%A7%89slam%E7%AC%94%E8%AE%B0%E7%89%B9%E5%BE%81%E7%82%B9%E6%B3%95%E7%9A%84%E5%9F%BA%E6%9C%AC%E6%B5%81%E7%A8%8B/</guid>
+      <description>梳理传统特征点法视觉SLAM的基本流程：前端跟踪、后端优化、回环检测和建图。</description>
+    </item>
+  </channel>
+</rss>

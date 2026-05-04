@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>4DGS on oyzg&#39;s note</title>
+    <link>https://oyzg.github.io/tags/4dgs/</link>
+    <description>Recent content in 4DGS on oyzg&#39;s note</description>
+    <generator>Hugo</generator>
+    <language>en-us</language>
+    <lastBuildDate>Fri, 25 Apr 2025 20:00:00 +0800</lastBuildDate>
+    <atom:link href="https://oyzg.github.io/tags/4dgs/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>4DGS-SLAM阅读笔记：从静态高斯地图到动态4D表示</title>
+      <link>https://oyzg.github.io/archives/4dgs-slam%E9%98%85%E8%AF%BB%E7%AC%94%E8%AE%B0%E4%BB%8E%E9%9D%99%E6%80%81%E9%AB%98%E6%96%AF%E5%9C%B0%E5%9B%BE%E5%88%B0%E5%8A%A8%E6%80%814d%E8%A1%A8%E7%A4%BA/</link>
+      <pubDate>Fri, 25 Apr 2025 20:00:00 +0800</pubDate>
+      <guid>https://oyzg.github.io/archives/4dgs-slam%E9%98%85%E8%AF%BB%E7%AC%94%E8%AE%B0%E4%BB%8E%E9%9D%99%E6%80%81%E9%AB%98%E6%96%AF%E5%9C%B0%E5%9B%BE%E5%88%B0%E5%8A%A8%E6%80%814d%E8%A1%A8%E7%A4%BA/</guid>
+      <description>阅读4D Gaussian Splatting SLAM，理解动态场景中为什么需要从静态3D高斯地图扩展到4D高斯表示。</description>
+    </item>
+  </channel>
+</rss>

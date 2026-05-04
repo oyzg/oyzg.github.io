@@ -1,0 +1,420 @@
+<!DOCTYPE html>
+<html lang="en" dir="auto">
+
+<head><meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<meta name="robots" content="index, follow">
+<title>DROID-SLAM阅读笔记：Dense Bundle Adjustment与深度SLAM | oyzg&#39;s note</title>
+
+<meta name="keywords" content="SLAM, DROID-SLAM, 深度学习, Bundle Adjustment" />
+<meta name="description" content="阅读DROID-SLAM，理解它如何用循环更新和Dense Bundle Adjustment统一单目、双目和RGB-D视觉SLAM。">
+<meta name="author" content="">
+<link rel="canonical" href="https://oyzg.github.io/archives/droid-slam%E9%98%85%E8%AF%BB%E7%AC%94%E8%AE%B0dense-bundle-adjustment%E4%B8%8E%E6%B7%B1%E5%BA%A6slam/" />
+<link href="/assets/css/stylesheet.min.d597aab94c71b49b163b6ac67c7958079589ea1a0b7300e8a0014e1d2023b95e.css" integrity="sha256-1ZequUxxtJsWO2rGfHlYB5WJ6hoLcwDooAFOHSAjuV4=" rel="preload stylesheet"
+    as="style">
+
+<link rel="icon" href="https://oyzg.github.io/favicon.ico">
+<link rel="icon" type="image/png" sizes="16x16" href="https://oyzg.github.io/favicon-16x16.png">
+<link rel="icon" type="image/png" sizes="32x32" href="https://oyzg.github.io/favicon-32x32.png">
+<link rel="apple-touch-icon" href="https://oyzg.github.io/apple-touch-icon.png">
+<link rel="mask-icon" href="https://oyzg.github.io/safari-pinned-tab.svg">
+<meta name="theme-color" content="#2e2e33">
+<meta name="msapplication-TileColor" content="#2e2e33">
+<meta name="generator" content="Hugo 0.147.4">
+<link rel="alternate" hreflang="en" href="https://oyzg.github.io/archives/droid-slam%E9%98%85%E8%AF%BB%E7%AC%94%E8%AE%B0dense-bundle-adjustment%E4%B8%8E%E6%B7%B1%E5%BA%A6slam/" />
+
+
+
+<meta property="og:title" content="DROID-SLAM阅读笔记：Dense Bundle Adjustment与深度SLAM" />
+<meta property="og:description" content="阅读DROID-SLAM，理解它如何用循环更新和Dense Bundle Adjustment统一单目、双目和RGB-D视觉SLAM。" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://oyzg.github.io/archives/droid-slam%E9%98%85%E8%AF%BB%E7%AC%94%E8%AE%B0dense-bundle-adjustment%E4%B8%8E%E6%B7%B1%E5%BA%A6slam/" />
+<meta property="article:published_time" content="2024-11-10T20:00:00+08:00" />
+<meta property="article:modified_time" content="2024-11-10T20:00:00+08:00" />
+
+<meta name="twitter:card" content="summary"/>
+<meta name="twitter:title" content="DROID-SLAM阅读笔记：Dense Bundle Adjustment与深度SLAM"/>
+<meta name="twitter:description" content="阅读DROID-SLAM，理解它如何用循环更新和Dense Bundle Adjustment统一单目、双目和RGB-D视觉SLAM。"/>
+
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position":  1 ,
+      "name": "DROID-SLAM阅读笔记：Dense Bundle Adjustment与深度SLAM",
+      "item": "https://oyzg.github.io/archives/droid-slam%E9%98%85%E8%AF%BB%E7%AC%94%E8%AE%B0dense-bundle-adjustment%E4%B8%8E%E6%B7%B1%E5%BA%A6slam/"
+    }
+  ]
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": "DROID-SLAM阅读笔记：Dense Bundle Adjustment与深度SLAM",
+  "name": "DROID-SLAM阅读笔记：Dense Bundle Adjustment与深度SLAM",
+  "description": "阅读DROID-SLAM，理解它如何用循环更新和Dense Bundle Adjustment统一单目、双目和RGB-D视觉SLAM。",
+  "keywords": [
+    "SLAM", "DROID-SLAM", "深度学习", "Bundle Adjustment"
+  ],
+  "articleBody": "DROID-SLAM阅读笔记：Dense Bundle Adjustment与深度SLAM DROID-SLAM 论文提交于 2021-08，题目是 DROID-SLAM: Deep Visual SLAM for Monocular, Stereo, and RGB-D Cameras。它把深度学习和几何优化结合得比较紧，不是简单地用网络直接回归位姿，而是把 Dense Bundle Adjustment 放进了系统里。\n传统特征点法 SLAM 依赖特征提取、匹配、PnP、BA、回环等模块。DROID-SLAM 没有把几何全扔掉，而是把传统几何优化里的核心结构保留下来，再用神经网络学习更新规则，并把优化做得更稠密。\n核心问题 DROID-SLAM 想解决的问题：能不能设计一个统一的深度 SLAM 系统，在单目、双目、RGB-D 输入下都能工作，并且比传统方法更鲁棒？\n传统 SLAM 的失败经常来自前端匹配不稳定，例如弱纹理、运动模糊、光照变化、特征点不足。直接法虽然利用更多像素，但对光度一致性和初始化敏感。深度学习方法可以学习更鲁棒的图像匹配和几何更新，但如果完全抛弃几何约束，又容易缺少可解释性和泛化能力。\nDROID-SLAM 的特点在于它没有简单地让网络直接回归位姿，而是把问题组织成一个反复迭代的优化过程。网络预测更新量，Dense Bundle Adjustment 层执行几何一致性更新。这样既利用了学习特征，又保留了 BA 的结构。\n系统变量 DROID-SLAM 维护的核心变量包括：\n相机位姿：每个关键帧或活动帧的 SE(3) 位姿。 像素级深度：不是稀疏地图点，而是较稠密的 depth。 图像特征：用于建立帧间 correspondence。 帧图结构：决定哪些帧之间建立约束。 和传统稀疏 BA 不同，DROID-SLAM 的优化对象更稠密。它不是只在几百个或几千个特征点上做重投影，而是在更密集的像素或特征网格上估计几何关系。\n这也是它和 ORB-SLAM 这类系统最直观的区别：ORB-SLAM 通过稀疏特征点表达观测，DROID-SLAM 通过 learned dense correspondence 和 dense depth 表达观测。\nRecurrent update DROID-SLAM 的一个核心设计是 recurrent iterative update。可以把它理解为：系统不是一次性预测最终位姿和深度，而是反复查看当前估计和图像证据之间的差异，然后逐步修正。\n这个过程和 RAFT 光流方法有相似直觉。RAFT 通过 correlation volume 和循环更新逐步优化光流，DROID-SLAM 则把类似思想扩展到 SLAM 中的位姿和深度估计。\n每次迭代中，系统会根据当前位姿和深度，把一个帧中的像素投影到另一个帧，查询图像特征之间的相关性，得到当前几何估计的残差信息。网络根据这些残差和隐藏状态预测修正量，随后通过 Dense BA 更新位姿和深度。\n关键是“迭代”。单次预测不一定准，但反复修正可以逐步接近几何一致的结果。传统 SLAM 里的非线性优化也是这个味道，只是 DROID-SLAM 把一部分更新策略交给网络学习。\nCorrelation volume 为了判断两帧之间哪些像素对应，DROID-SLAM 使用特征相关性。图像经过特征网络后，每个像素或网格位置都有一个特征向量。不同帧之间可以计算特征相关性，形成 correlation volume。\n如果当前位姿和深度估计正确，一个像素投影到另一帧后，应该落在特征相似的位置。反过来，如果投影位置附近的相关性分布显示更好的匹配在别处，就说明当前几何估计需要调整。\n这和传统特征匹配有相似目标，但方式不同。传统方法先离散地找特征点和匹配关系，再把匹配关系交给几何优化。DROID-SLAM 则用稠密特征相关性为优化提供连续的匹配证据。\nDense Bundle Adjustment DROID-SLAM 最重要的模块是 Dense Bundle Adjustment。传统 BA 最小化的是稀疏特征点的重投影误差，而 Dense BA 使用更密集的像素级或网格级约束，同时优化相机位姿和深度。\n直觉上，Dense BA 做的是：当前系统认为某个像素有一个深度，在当前帧位姿下它对应空间中的一个三维点。把这个点投影到其他帧，应当和其他帧中的对应观测一致。如果不一致，就需要调整位姿和深度。\nDROID-SLAM 的 Dense BA 是可微的，可以放进神经网络训练流程中。这一点很重要。它不是在网络外部单独跑一个传统优化器，而是成为模型结构的一部分，使网络能学习如何产生适合几何优化的更新。\n这也是它比简单深度回归更像 SLAM 的地方：SLAM 的核心不是单帧深度估计，而是多帧之间的几何一致性。\n单目、双目和RGB-D DROID-SLAM 的另一个亮点是统一多种输入形式。论文强调，虽然训练时使用单目视频，但测试时可以利用双目或 RGB-D 输入获得更好效果。\n单目输入下，尺度本身存在不确定性。系统只能从视频运动中恢复相对尺度。双目输入提供左右相机基线，可以约束真实尺度。RGB-D 输入直接提供深度观测，也能增强深度估计稳定性。\n从工程角度看，这种统一性很有价值。很多传统系统会为单目、双目、RGB-D 分别设计不同流程，而 DROID-SLAM 试图用同一套 recurrent update + Dense BA 处理不同传感器条件。\n和传统SLAM的关系 DROID-SLAM 并不是完全抛弃传统 SLAM，更像是把传统 SLAM 中最核心的两个部分保留下来：\n多视图几何一致性。 Bundle Adjustment。 然后用深度网络替代或增强前端 correspondence 和优化更新。传统 SLAM 里，匹配关系主要由手工特征和几何筛选得到；DROID-SLAM 里，匹配证据来自 learned feature correlation。传统 BA 需要手写残差和求解流程；DROID-SLAM 把 dense BA 做成可微模块，并和网络循环更新结合。\n所以我学习 DROID-SLAM 时，不想把它看成一个“黑盒位姿回归网络”。它本质上仍然是几何优化，只是优化过程被学习方法增强了。\n对3DGS-SLAM的意义 3DGS-SLAM 的一个关键难点是 tracking。如果相机位姿不准，Gaussian 地图很容易被写坏。尤其是单目 3DGS-SLAM，既要估计尺度和深度，又要优化地图外观，问题非常耦合。\nDROID-SLAM 给了一个强前端思路：先用学习式稠密 SLAM 得到比较稳的位姿和深度，再把这些结果接到 Gaussian mapping 或 rendering 模块中。后来的 DROID-Splat 就是类似方向：用 end-to-end tracker 提供强 tracking，再用 3DGS renderer 提升地图表达和渲染质量。\n从系统设计看，DROID-SLAM 可以作为 3DGS-SLAM 的 tracking backbone，也可以作为初始化器。它估计的深度和位姿能为 Gaussian 初始化提供几何基础，减少纯 photometric optimization 的不稳定性。\n局限 DROID-SLAM 虽然鲁棒，但也有局限。\n第一，它依赖训练数据和网络泛化。遇到和训练分布差异很大的场景，性能可能下降。\n第二，稠密优化带来更高算力需求。相比 ORB-SLAM 这类 CPU 友好的系统，DROID-SLAM 更依赖 GPU。\n第三，它的地图表达并不是为了高质量渲染设计的。DROID-SLAM 更关注位姿和深度估计，而不是生成 photorealistic map。如果想要更好的地图外观表达，还需要接入其他表示方式。\n第四，动态场景仍然是挑战。学习式 correspondence 可能更鲁棒，但如果动态物体占据大量视野，多视图一致性仍然会被破坏。WildGS-SLAM 和 4DGS-SLAM 继续处理的就是这个问题。\n记录 DROID-SLAM 的核心可以概括成三件事：用 learned dense correspondence 提供匹配证据，用 recurrent update 逐步修正估计，用 Dense Bundle Adjustment 保持几何一致性。它不是简单的端到端位姿回归，而是学习和几何优化结合的 SLAM 系统。\nDROID-SLAM 对我最大的启发主要在 tracking。高质量地图依赖稳定位姿，而 DROID-SLAM 这样的系统提供了一条强跟踪路线。理解这一点后，再设计 SLAM 系统时，就能更清楚地区分 tracking 和 mapping 的职责。\n参考 DROID-SLAM: Deep Visual SLAM for Monocular, Stereo, and RGB-D Cameras RAFT: Recurrent All-Pairs Field Transforms for Optical Flow DROID-Splat: Combining end-to-end SLAM with 3D Gaussian Splatting ",
+  "wordCount" : "281",
+  "inLanguage": "en",
+  "datePublished": "2024-11-10T20:00:00+08:00",
+  "dateModified": "2024-11-10T20:00:00+08:00",
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id": "https://oyzg.github.io/archives/droid-slam%E9%98%85%E8%AF%BB%E7%AC%94%E8%AE%B0dense-bundle-adjustment%E4%B8%8E%E6%B7%B1%E5%BA%A6slam/"
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "oyzg's note",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "https://oyzg.github.io/favicon.ico"
+    }
+  }
+}
+</script>
+
+
+
+
+
+</head>
+
+<body class="" id="top">
+<script>
+    if (localStorage.getItem("pref-theme") === "dark") {
+        document.body.classList.add('dark');
+    } else if (localStorage.getItem("pref-theme") === "light") {
+        document.body.classList.remove('dark')
+    } else if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+        document.body.classList.add('dark');
+    }
+
+</script>
+<noscript>
+    <style type="text/css">
+        #theme-toggle,
+        .top-link {
+            display: none;
+        }
+
+    </style>
+</noscript>
+<header class="header">
+    <nav class="nav">
+        <div class="logo">
+            <a href="https://oyzg.github.io/" accesskey="h" title="oyzg&#39;s note (Alt + H)">oyzg&#39;s note</a>
+            <span class="logo-switches">
+                <button id="theme-toggle" accesskey="t" title="(Alt + T)">
+                    <svg id="moon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                    </svg>
+                    <svg id="sun" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="5"></circle>
+                        <line x1="12" y1="1" x2="12" y2="3"></line>
+                        <line x1="12" y1="21" x2="12" y2="23"></line>
+                        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                        <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                        <line x1="1" y1="12" x2="3" y2="12"></line>
+                        <line x1="21" y1="12" x2="23" y2="12"></line>
+                        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                        <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+                    </svg>
+                </button>
+                
+                
+
+                <ul class="lang-switch"><li>|</li>
+                </ul>
+            </span>
+        </div>
+        <ul id="menu" onscroll="menu_on_scroll()">
+            <li>
+                <a href="https://oyzg.github.io/archives/" title="Archive">
+                    <span>Archive</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://oyzg.github.io/categories/" title="Categories">
+                    <span>Categories</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://oyzg.github.io/series/" title="Series">
+                    <span>Series</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://oyzg.github.io/tags/" title="Tags">
+                    <span>Tags</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://oyzg.github.io/search/" title="Search (Alt &#43; /)" accesskey=/>
+                    <span>Search</span>
+                </a>
+            </li></ul>
+    </nav>
+</header>
+
+    <main class="main">
+
+<article class="post-single">
+  <header class="post-header">
+
+    <h1 class="post-title">
+      DROID-SLAM阅读笔记：Dense Bundle Adjustment与深度SLAM
+    </h1>
+    <div class="post-meta">November 10, 2024 · 2 min
+
+</div>
+  </header> 
+
+  <div class="toc">
+    <details >
+      <summary accesskey="c" title="(Alt + C)">
+        <div class="details">Table of Contents</div>
+      </summary>
+      <div class="inner"><ul><li>
+        <a href="#droid-slam%e9%98%85%e8%af%bb%e7%ac%94%e8%ae%b0dense-bundle-adjustment%e4%b8%8e%e6%b7%b1%e5%ba%a6slam" aria-label="DROID-SLAM阅读笔记：Dense Bundle Adjustment与深度SLAM">DROID-SLAM阅读笔记：Dense Bundle Adjustment与深度SLAM</a><ul>
+            <li>
+        <a href="#%e6%a0%b8%e5%bf%83%e9%97%ae%e9%a2%98" aria-label="核心问题">核心问题</a></li><li>
+        <a href="#%e7%b3%bb%e7%bb%9f%e5%8f%98%e9%87%8f" aria-label="系统变量">系统变量</a></li><li>
+        <a href="#recurrent-update" aria-label="Recurrent update">Recurrent update</a></li><li>
+        <a href="#correlation-volume" aria-label="Correlation volume">Correlation volume</a></li><li>
+        <a href="#dense-bundle-adjustment" aria-label="Dense Bundle Adjustment">Dense Bundle Adjustment</a></li><li>
+        <a href="#%e5%8d%95%e7%9b%ae%e5%8f%8c%e7%9b%ae%e5%92%8crgb-d" aria-label="单目、双目和RGB-D">单目、双目和RGB-D</a></li><li>
+        <a href="#%e5%92%8c%e4%bc%a0%e7%bb%9fslam%e7%9a%84%e5%85%b3%e7%b3%bb" aria-label="和传统SLAM的关系">和传统SLAM的关系</a></li><li>
+        <a href="#%e5%af%b93dgs-slam%e7%9a%84%e6%84%8f%e4%b9%89" aria-label="对3DGS-SLAM的意义">对3DGS-SLAM的意义</a></li><li>
+        <a href="#%e5%b1%80%e9%99%90" aria-label="局限">局限</a></li><li>
+        <a href="#%e8%ae%b0%e5%bd%95" aria-label="记录">记录</a></li><li>
+        <a href="#%e5%8f%82%e8%80%83" aria-label="参考">参考</a></li></ul>
+</li></ul>
+      </div>
+    </details>
+  </div>
+  <div class="post-content">
+    
+<h1 id="droid-slam阅读笔记dense-bundle-adjustment与深度slam">DROID-SLAM阅读笔记：Dense Bundle Adjustment与深度SLAM<a hidden class="anchor" aria-hidden="true" href="#droid-slam阅读笔记dense-bundle-adjustment与深度slam">#</a></h1>
+<p>DROID-SLAM 论文提交于 2021-08，题目是 <em>DROID-SLAM: Deep Visual SLAM for Monocular, Stereo, and RGB-D Cameras</em>。它把深度学习和几何优化结合得比较紧，不是简单地用网络直接回归位姿，而是把 Dense Bundle Adjustment 放进了系统里。</p>
+<p>传统特征点法 SLAM 依赖特征提取、匹配、PnP、BA、回环等模块。DROID-SLAM 没有把几何全扔掉，而是把传统几何优化里的核心结构保留下来，再用神经网络学习更新规则，并把优化做得更稠密。</p>
+<h2 id="核心问题">核心问题<a hidden class="anchor" aria-hidden="true" href="#核心问题">#</a></h2>
+<p>DROID-SLAM 想解决的问题：能不能设计一个统一的深度 SLAM 系统，在单目、双目、RGB-D 输入下都能工作，并且比传统方法更鲁棒？</p>
+<p>传统 SLAM 的失败经常来自前端匹配不稳定，例如弱纹理、运动模糊、光照变化、特征点不足。直接法虽然利用更多像素，但对光度一致性和初始化敏感。深度学习方法可以学习更鲁棒的图像匹配和几何更新，但如果完全抛弃几何约束，又容易缺少可解释性和泛化能力。</p>
+<p>DROID-SLAM 的特点在于它没有简单地让网络直接回归位姿，而是把问题组织成一个反复迭代的优化过程。网络预测更新量，Dense Bundle Adjustment 层执行几何一致性更新。这样既利用了学习特征，又保留了 BA 的结构。</p>
+<h2 id="系统变量">系统变量<a hidden class="anchor" aria-hidden="true" href="#系统变量">#</a></h2>
+<p>DROID-SLAM 维护的核心变量包括：</p>
+<ul>
+<li>相机位姿：每个关键帧或活动帧的 SE(3) 位姿。</li>
+<li>像素级深度：不是稀疏地图点，而是较稠密的 depth。</li>
+<li>图像特征：用于建立帧间 correspondence。</li>
+<li>帧图结构：决定哪些帧之间建立约束。</li>
+</ul>
+<p>和传统稀疏 BA 不同，DROID-SLAM 的优化对象更稠密。它不是只在几百个或几千个特征点上做重投影，而是在更密集的像素或特征网格上估计几何关系。</p>
+<p>这也是它和 ORB-SLAM 这类系统最直观的区别：ORB-SLAM 通过稀疏特征点表达观测，DROID-SLAM 通过 learned dense correspondence 和 dense depth 表达观测。</p>
+<h2 id="recurrent-update">Recurrent update<a hidden class="anchor" aria-hidden="true" href="#recurrent-update">#</a></h2>
+<p>DROID-SLAM 的一个核心设计是 recurrent iterative update。可以把它理解为：系统不是一次性预测最终位姿和深度，而是反复查看当前估计和图像证据之间的差异，然后逐步修正。</p>
+<p>这个过程和 RAFT 光流方法有相似直觉。RAFT 通过 correlation volume 和循环更新逐步优化光流，DROID-SLAM 则把类似思想扩展到 SLAM 中的位姿和深度估计。</p>
+<p>每次迭代中，系统会根据当前位姿和深度，把一个帧中的像素投影到另一个帧，查询图像特征之间的相关性，得到当前几何估计的残差信息。网络根据这些残差和隐藏状态预测修正量，随后通过 Dense BA 更新位姿和深度。</p>
+<p>关键是“迭代”。单次预测不一定准，但反复修正可以逐步接近几何一致的结果。传统 SLAM 里的非线性优化也是这个味道，只是 DROID-SLAM 把一部分更新策略交给网络学习。</p>
+<h2 id="correlation-volume">Correlation volume<a hidden class="anchor" aria-hidden="true" href="#correlation-volume">#</a></h2>
+<p>为了判断两帧之间哪些像素对应，DROID-SLAM 使用特征相关性。图像经过特征网络后，每个像素或网格位置都有一个特征向量。不同帧之间可以计算特征相关性，形成 correlation volume。</p>
+<p>如果当前位姿和深度估计正确，一个像素投影到另一帧后，应该落在特征相似的位置。反过来，如果投影位置附近的相关性分布显示更好的匹配在别处，就说明当前几何估计需要调整。</p>
+<p>这和传统特征匹配有相似目标，但方式不同。传统方法先离散地找特征点和匹配关系，再把匹配关系交给几何优化。DROID-SLAM 则用稠密特征相关性为优化提供连续的匹配证据。</p>
+<h2 id="dense-bundle-adjustment">Dense Bundle Adjustment<a hidden class="anchor" aria-hidden="true" href="#dense-bundle-adjustment">#</a></h2>
+<p>DROID-SLAM 最重要的模块是 Dense Bundle Adjustment。传统 BA 最小化的是稀疏特征点的重投影误差，而 Dense BA 使用更密集的像素级或网格级约束，同时优化相机位姿和深度。</p>
+<p>直觉上，Dense BA 做的是：当前系统认为某个像素有一个深度，在当前帧位姿下它对应空间中的一个三维点。把这个点投影到其他帧，应当和其他帧中的对应观测一致。如果不一致，就需要调整位姿和深度。</p>
+<p>DROID-SLAM 的 Dense BA 是可微的，可以放进神经网络训练流程中。这一点很重要。它不是在网络外部单独跑一个传统优化器，而是成为模型结构的一部分，使网络能学习如何产生适合几何优化的更新。</p>
+<p>这也是它比简单深度回归更像 SLAM 的地方：SLAM 的核心不是单帧深度估计，而是多帧之间的几何一致性。</p>
+<h2 id="单目双目和rgb-d">单目、双目和RGB-D<a hidden class="anchor" aria-hidden="true" href="#单目双目和rgb-d">#</a></h2>
+<p>DROID-SLAM 的另一个亮点是统一多种输入形式。论文强调，虽然训练时使用单目视频，但测试时可以利用双目或 RGB-D 输入获得更好效果。</p>
+<p>单目输入下，尺度本身存在不确定性。系统只能从视频运动中恢复相对尺度。双目输入提供左右相机基线，可以约束真实尺度。RGB-D 输入直接提供深度观测，也能增强深度估计稳定性。</p>
+<p>从工程角度看，这种统一性很有价值。很多传统系统会为单目、双目、RGB-D 分别设计不同流程，而 DROID-SLAM 试图用同一套 recurrent update + Dense BA 处理不同传感器条件。</p>
+<h2 id="和传统slam的关系">和传统SLAM的关系<a hidden class="anchor" aria-hidden="true" href="#和传统slam的关系">#</a></h2>
+<p>DROID-SLAM 并不是完全抛弃传统 SLAM，更像是把传统 SLAM 中最核心的两个部分保留下来：</p>
+<ul>
+<li>多视图几何一致性。</li>
+<li>Bundle Adjustment。</li>
+</ul>
+<p>然后用深度网络替代或增强前端 correspondence 和优化更新。传统 SLAM 里，匹配关系主要由手工特征和几何筛选得到；DROID-SLAM 里，匹配证据来自 learned feature correlation。传统 BA 需要手写残差和求解流程；DROID-SLAM 把 dense BA 做成可微模块，并和网络循环更新结合。</p>
+<p>所以我学习 DROID-SLAM 时，不想把它看成一个“黑盒位姿回归网络”。它本质上仍然是几何优化，只是优化过程被学习方法增强了。</p>
+<h2 id="对3dgs-slam的意义">对3DGS-SLAM的意义<a hidden class="anchor" aria-hidden="true" href="#对3dgs-slam的意义">#</a></h2>
+<p>3DGS-SLAM 的一个关键难点是 tracking。如果相机位姿不准，Gaussian 地图很容易被写坏。尤其是单目 3DGS-SLAM，既要估计尺度和深度，又要优化地图外观，问题非常耦合。</p>
+<p>DROID-SLAM 给了一个强前端思路：先用学习式稠密 SLAM 得到比较稳的位姿和深度，再把这些结果接到 Gaussian mapping 或 rendering 模块中。后来的 DROID-Splat 就是类似方向：用 end-to-end tracker 提供强 tracking，再用 3DGS renderer 提升地图表达和渲染质量。</p>
+<p>从系统设计看，DROID-SLAM 可以作为 3DGS-SLAM 的 tracking backbone，也可以作为初始化器。它估计的深度和位姿能为 Gaussian 初始化提供几何基础，减少纯 photometric optimization 的不稳定性。</p>
+<h2 id="局限">局限<a hidden class="anchor" aria-hidden="true" href="#局限">#</a></h2>
+<p>DROID-SLAM 虽然鲁棒，但也有局限。</p>
+<p>第一，它依赖训练数据和网络泛化。遇到和训练分布差异很大的场景，性能可能下降。</p>
+<p>第二，稠密优化带来更高算力需求。相比 ORB-SLAM 这类 CPU 友好的系统，DROID-SLAM 更依赖 GPU。</p>
+<p>第三，它的地图表达并不是为了高质量渲染设计的。DROID-SLAM 更关注位姿和深度估计，而不是生成 photorealistic map。如果想要更好的地图外观表达，还需要接入其他表示方式。</p>
+<p>第四，动态场景仍然是挑战。学习式 correspondence 可能更鲁棒，但如果动态物体占据大量视野，多视图一致性仍然会被破坏。WildGS-SLAM 和 4DGS-SLAM 继续处理的就是这个问题。</p>
+<h2 id="记录">记录<a hidden class="anchor" aria-hidden="true" href="#记录">#</a></h2>
+<p>DROID-SLAM 的核心可以概括成三件事：用 learned dense correspondence 提供匹配证据，用 recurrent update 逐步修正估计，用 Dense Bundle Adjustment 保持几何一致性。它不是简单的端到端位姿回归，而是学习和几何优化结合的 SLAM 系统。</p>
+<p>DROID-SLAM 对我最大的启发主要在 tracking。高质量地图依赖稳定位姿，而 DROID-SLAM 这样的系统提供了一条强跟踪路线。理解这一点后，再设计 SLAM 系统时，就能更清楚地区分 tracking 和 mapping 的职责。</p>
+<h2 id="参考">参考<a hidden class="anchor" aria-hidden="true" href="#参考">#</a></h2>
+<ul>
+<li><a href="https://arxiv.org/abs/2108.10869">DROID-SLAM: Deep Visual SLAM for Monocular, Stereo, and RGB-D Cameras</a></li>
+<li><a href="https://arxiv.org/abs/2003.12039">RAFT: Recurrent All-Pairs Field Transforms for Optical Flow</a></li>
+<li><a href="https://arxiv.org/abs/2411.17660">DROID-Splat: Combining end-to-end SLAM with 3D Gaussian Splatting</a></li>
+</ul>
+
+</div>
+  <footer class="post-footer">
+    <ul class="post-tags">
+      <li><a href="https://oyzg.github.io/tags/slam/">SLAM</a></li>
+      <li><a href="https://oyzg.github.io/tags/droid-slam/">DROID-SLAM</a></li>
+      <li><a href="https://oyzg.github.io/tags/%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0/">深度学习</a></li>
+      <li><a href="https://oyzg.github.io/tags/bundle-adjustment/">Bundle Adjustment</a></li>
+    </ul>
+    <nav class="paginav">
+      <a class="prev" href="https://oyzg.github.io/archives/wildgs-slam%E9%98%85%E8%AF%BB%E7%AC%94%E8%AE%B0%E5%8A%A8%E6%80%81%E7%8E%AF%E5%A2%83%E4%B8%8B%E7%9A%84%E5%8D%95%E7%9B%AEgaussian-slam/">
+        <span class="title">« Prev Page</span>
+        <br>
+        <span>WildGS-SLAM阅读笔记：动态环境下的单目Gaussian SLAM</span>
+      </a>
+      <a class="next" href="https://oyzg.github.io/archives/3d-gaussian-splatting%E7%AC%94%E8%AE%B0%E4%BB%8E%E7%82%B9%E4%BA%91%E5%88%B0%E5%8F%AF%E5%BE%AE%E6%B8%B2%E6%9F%93/">
+        <span class="title">Next Page »</span>
+        <br>
+        <span>3D Gaussian Splatting笔记：从点云到可微渲染</span>
+      </a>
+    </nav>
+
+
+
+
+
+
+<div class="share-buttons">
+    <a target="_blank" rel="noopener noreferrer" aria-label="share DROID-SLAM阅读笔记：Dense Bundle Adjustment与深度SLAM on twitter"
+        href="https://twitter.com/intent/tweet/?text=DROID-SLAM%e9%98%85%e8%af%bb%e7%ac%94%e8%ae%b0%ef%bc%9aDense%20Bundle%20Adjustment%e4%b8%8e%e6%b7%b1%e5%ba%a6SLAM&amp;url=https%3a%2f%2foyzg.github.io%2farchives%2fdroid-slam%25E9%2598%2585%25E8%25AF%25BB%25E7%25AC%2594%25E8%25AE%25B0dense-bundle-adjustment%25E4%25B8%258E%25E6%25B7%25B1%25E5%25BA%25A6slam%2f&amp;hashtags=SLAM%2cDROID-SLAM%2c%e6%b7%b1%e5%ba%a6%e5%ad%a6%e4%b9%a0%2cBundleAdjustment">
+        <svg version="1.1" viewBox="0 0 512 512" xml:space="preserve">
+            <path
+                d="M449.446,0c34.525,0 62.554,28.03 62.554,62.554l0,386.892c0,34.524 -28.03,62.554 -62.554,62.554l-386.892,0c-34.524,0 -62.554,-28.03 -62.554,-62.554l0,-386.892c0,-34.524 28.029,-62.554 62.554,-62.554l386.892,0Zm-253.927,424.544c135.939,0 210.268,-112.643 210.268,-210.268c0,-3.218 0,-6.437 -0.153,-9.502c14.406,-10.421 26.973,-23.448 36.935,-38.314c-13.18,5.824 -27.433,9.809 -42.452,11.648c15.326,-9.196 26.973,-23.602 32.49,-40.92c-14.252,8.429 -30.038,14.56 -46.896,17.931c-13.487,-14.406 -32.644,-23.295 -53.946,-23.295c-40.767,0 -73.87,33.104 -73.87,73.87c0,5.824 0.613,11.494 1.992,16.858c-61.456,-3.065 -115.862,-32.49 -152.337,-77.241c-6.284,10.881 -9.962,23.601 -9.962,37.088c0,25.594 13.027,48.276 32.95,61.456c-12.107,-0.307 -23.448,-3.678 -33.41,-9.196l0,0.92c0,35.862 25.441,65.594 59.311,72.49c-6.13,1.686 -12.72,2.606 -19.464,2.606c-4.751,0 -9.348,-0.46 -13.946,-1.38c9.349,29.426 36.628,50.728 68.965,51.341c-25.287,19.771 -57.164,31.571 -91.8,31.571c-5.977,0 -11.801,-0.306 -17.625,-1.073c32.337,21.15 71.264,33.41 112.95,33.41Z" />
+        </svg>
+    </a>
+    <a target="_blank" rel="noopener noreferrer" aria-label="share DROID-SLAM阅读笔记：Dense Bundle Adjustment与深度SLAM on linkedin"
+        href="https://www.linkedin.com/shareArticle?mini=true&amp;url=https%3a%2f%2foyzg.github.io%2farchives%2fdroid-slam%25E9%2598%2585%25E8%25AF%25BB%25E7%25AC%2594%25E8%25AE%25B0dense-bundle-adjustment%25E4%25B8%258E%25E6%25B7%25B1%25E5%25BA%25A6slam%2f&amp;title=DROID-SLAM%e9%98%85%e8%af%bb%e7%ac%94%e8%ae%b0%ef%bc%9aDense%20Bundle%20Adjustment%e4%b8%8e%e6%b7%b1%e5%ba%a6SLAM&amp;summary=DROID-SLAM%e9%98%85%e8%af%bb%e7%ac%94%e8%ae%b0%ef%bc%9aDense%20Bundle%20Adjustment%e4%b8%8e%e6%b7%b1%e5%ba%a6SLAM&amp;source=https%3a%2f%2foyzg.github.io%2farchives%2fdroid-slam%25E9%2598%2585%25E8%25AF%25BB%25E7%25AC%2594%25E8%25AE%25B0dense-bundle-adjustment%25E4%25B8%258E%25E6%25B7%25B1%25E5%25BA%25A6slam%2f">
+        <svg version="1.1" viewBox="0 0 512 512" xml:space="preserve">
+            <path
+                d="M449.446,0c34.525,0 62.554,28.03 62.554,62.554l0,386.892c0,34.524 -28.03,62.554 -62.554,62.554l-386.892,0c-34.524,0 -62.554,-28.03 -62.554,-62.554l0,-386.892c0,-34.524 28.029,-62.554 62.554,-62.554l386.892,0Zm-288.985,423.278l0,-225.717l-75.04,0l0,225.717l75.04,0Zm270.539,0l0,-129.439c0,-69.333 -37.018,-101.586 -86.381,-101.586c-39.804,0 -57.634,21.891 -67.617,37.266l0,-31.958l-75.021,0c0.995,21.181 0,225.717 0,225.717l75.02,0l0,-126.056c0,-6.748 0.486,-13.492 2.474,-18.315c5.414,-13.475 17.767,-27.434 38.494,-27.434c27.135,0 38.007,20.707 38.007,51.037l0,120.768l75.024,0Zm-307.552,-334.556c-25.674,0 -42.448,16.879 -42.448,39.002c0,21.658 16.264,39.002 41.455,39.002l0.484,0c26.165,0 42.452,-17.344 42.452,-39.002c-0.485,-22.092 -16.241,-38.954 -41.943,-39.002Z" />
+        </svg>
+    </a>
+    <a target="_blank" rel="noopener noreferrer" aria-label="share DROID-SLAM阅读笔记：Dense Bundle Adjustment与深度SLAM on reddit"
+        href="https://reddit.com/submit?url=https%3a%2f%2foyzg.github.io%2farchives%2fdroid-slam%25E9%2598%2585%25E8%25AF%25BB%25E7%25AC%2594%25E8%25AE%25B0dense-bundle-adjustment%25E4%25B8%258E%25E6%25B7%25B1%25E5%25BA%25A6slam%2f&title=DROID-SLAM%e9%98%85%e8%af%bb%e7%ac%94%e8%ae%b0%ef%bc%9aDense%20Bundle%20Adjustment%e4%b8%8e%e6%b7%b1%e5%ba%a6SLAM">
+        <svg version="1.1" viewBox="0 0 512 512" xml:space="preserve">
+            <path
+                d="M449.446,0c34.525,0 62.554,28.03 62.554,62.554l0,386.892c0,34.524 -28.03,62.554 -62.554,62.554l-386.892,0c-34.524,0 -62.554,-28.03 -62.554,-62.554l0,-386.892c0,-34.524 28.029,-62.554 62.554,-62.554l386.892,0Zm-3.446,265.638c0,-22.964 -18.616,-41.58 -41.58,-41.58c-11.211,0 -21.361,4.457 -28.841,11.666c-28.424,-20.508 -67.586,-33.757 -111.204,-35.278l18.941,-89.121l61.884,13.157c0.756,15.734 13.642,28.29 29.56,28.29c16.407,0 29.706,-13.299 29.706,-29.701c0,-16.403 -13.299,-29.702 -29.706,-29.702c-11.666,0 -21.657,6.792 -26.515,16.578l-69.105,-14.69c-1.922,-0.418 -3.939,-0.042 -5.585,1.036c-1.658,1.073 -2.811,2.761 -3.224,4.686l-21.152,99.438c-44.258,1.228 -84.046,14.494 -112.837,35.232c-7.468,-7.164 -17.589,-11.591 -28.757,-11.591c-22.965,0 -41.585,18.616 -41.585,41.58c0,16.896 10.095,31.41 24.568,37.918c-0.639,4.135 -0.99,8.328 -0.99,12.576c0,63.977 74.469,115.836 166.33,115.836c91.861,0 166.334,-51.859 166.334,-115.836c0,-4.218 -0.347,-8.387 -0.977,-12.493c14.564,-6.47 24.735,-21.034 24.735,-38.001Zm-119.474,108.193c-20.27,20.241 -59.115,21.816 -70.534,21.816c-11.428,0 -50.277,-1.575 -70.522,-21.82c-3.007,-3.008 -3.007,-7.882 0,-10.889c3.003,-2.999 7.882,-3.003 10.885,0c12.777,12.781 40.11,17.317 59.637,17.317c19.522,0 46.86,-4.536 59.657,-17.321c3.016,-2.999 7.886,-2.995 10.885,0.008c3.008,3.011 3.003,7.882 -0.008,10.889Zm-5.23,-48.781c-16.373,0 -29.701,-13.324 -29.701,-29.698c0,-16.381 13.328,-29.714 29.701,-29.714c16.378,0 29.706,13.333 29.706,29.714c0,16.374 -13.328,29.698 -29.706,29.698Zm-160.386,-29.702c0,-16.381 13.328,-29.71 29.714,-29.71c16.369,0 29.689,13.329 29.689,29.71c0,16.373 -13.32,29.693 -29.689,29.693c-16.386,0 -29.714,-13.32 -29.714,-29.693Z" />
+        </svg>
+    </a>
+    <a target="_blank" rel="noopener noreferrer" aria-label="share DROID-SLAM阅读笔记：Dense Bundle Adjustment与深度SLAM on facebook"
+        href="https://facebook.com/sharer/sharer.php?u=https%3a%2f%2foyzg.github.io%2farchives%2fdroid-slam%25E9%2598%2585%25E8%25AF%25BB%25E7%25AC%2594%25E8%25AE%25B0dense-bundle-adjustment%25E4%25B8%258E%25E6%25B7%25B1%25E5%25BA%25A6slam%2f">
+        <svg version="1.1" viewBox="0 0 512 512" xml:space="preserve">
+            <path
+                d="M449.446,0c34.525,0 62.554,28.03 62.554,62.554l0,386.892c0,34.524 -28.03,62.554 -62.554,62.554l-106.468,0l0,-192.915l66.6,0l12.672,-82.621l-79.272,0l0,-53.617c0,-22.603 11.073,-44.636 46.58,-44.636l36.042,0l0,-70.34c0,0 -32.71,-5.582 -63.982,-5.582c-65.288,0 -107.96,39.569 -107.96,111.204l0,62.971l-72.573,0l0,82.621l72.573,0l0,192.915l-191.104,0c-34.524,0 -62.554,-28.03 -62.554,-62.554l0,-386.892c0,-34.524 28.029,-62.554 62.554,-62.554l386.892,0Z" />
+        </svg>
+    </a>
+    <a target="_blank" rel="noopener noreferrer" aria-label="share DROID-SLAM阅读笔记：Dense Bundle Adjustment与深度SLAM on whatsapp"
+        href="https://api.whatsapp.com/send?text=DROID-SLAM%e9%98%85%e8%af%bb%e7%ac%94%e8%ae%b0%ef%bc%9aDense%20Bundle%20Adjustment%e4%b8%8e%e6%b7%b1%e5%ba%a6SLAM%20-%20https%3a%2f%2foyzg.github.io%2farchives%2fdroid-slam%25E9%2598%2585%25E8%25AF%25BB%25E7%25AC%2594%25E8%25AE%25B0dense-bundle-adjustment%25E4%25B8%258E%25E6%25B7%25B1%25E5%25BA%25A6slam%2f">
+        <svg version="1.1" viewBox="0 0 512 512" xml:space="preserve">
+            <path
+                d="M449.446,0c34.525,0 62.554,28.03 62.554,62.554l0,386.892c0,34.524 -28.03,62.554 -62.554,62.554l-386.892,0c-34.524,0 -62.554,-28.03 -62.554,-62.554l0,-386.892c0,-34.524 28.029,-62.554 62.554,-62.554l386.892,0Zm-58.673,127.703c-33.842,-33.881 -78.847,-52.548 -126.798,-52.568c-98.799,0 -179.21,80.405 -179.249,179.234c-0.013,31.593 8.241,62.428 23.927,89.612l-25.429,92.884l95.021,-24.925c26.181,14.28 55.659,21.807 85.658,21.816l0.074,0c98.789,0 179.206,-80.413 179.247,-179.243c0.018,-47.895 -18.61,-92.93 -52.451,-126.81Zm-126.797,275.782l-0.06,0c-26.734,-0.01 -52.954,-7.193 -75.828,-20.767l-5.441,-3.229l-56.386,14.792l15.05,-54.977l-3.542,-5.637c-14.913,-23.72 -22.791,-51.136 -22.779,-79.287c0.033,-82.142 66.867,-148.971 149.046,-148.971c39.793,0.014 77.199,15.531 105.329,43.692c28.128,28.16 43.609,65.592 43.594,105.4c-0.034,82.149 -66.866,148.983 -148.983,148.984Zm81.721,-111.581c-4.479,-2.242 -26.499,-13.075 -30.604,-14.571c-4.105,-1.495 -7.091,-2.241 -10.077,2.241c-2.986,4.483 -11.569,14.572 -14.182,17.562c-2.612,2.988 -5.225,3.364 -9.703,1.12c-4.479,-2.241 -18.91,-6.97 -36.017,-22.23c-13.314,-11.876 -22.304,-26.542 -24.916,-31.026c-2.612,-4.484 -0.279,-6.908 1.963,-9.14c2.016,-2.007 4.48,-5.232 6.719,-7.847c2.24,-2.615 2.986,-4.484 4.479,-7.472c1.493,-2.99 0.747,-5.604 -0.374,-7.846c-1.119,-2.241 -10.077,-24.288 -13.809,-33.256c-3.635,-8.733 -7.327,-7.55 -10.077,-7.688c-2.609,-0.13 -5.598,-0.158 -8.583,-0.158c-2.986,0 -7.839,1.121 -11.944,5.604c-4.105,4.484 -15.675,15.32 -15.675,37.364c0,22.046 16.048,43.342 18.287,46.332c2.24,2.99 31.582,48.227 76.511,67.627c10.685,4.615 19.028,7.371 25.533,9.434c10.728,3.41 20.492,2.929 28.209,1.775c8.605,-1.285 26.499,-10.833 30.231,-21.295c3.732,-10.464 3.732,-19.431 2.612,-21.298c-1.119,-1.869 -4.105,-2.99 -8.583,-5.232Z" />
+        </svg>
+    </a>
+    <a target="_blank" rel="noopener noreferrer" aria-label="share DROID-SLAM阅读笔记：Dense Bundle Adjustment与深度SLAM on telegram"
+        href="https://telegram.me/share/url?text=DROID-SLAM%e9%98%85%e8%af%bb%e7%ac%94%e8%ae%b0%ef%bc%9aDense%20Bundle%20Adjustment%e4%b8%8e%e6%b7%b1%e5%ba%a6SLAM&amp;url=https%3a%2f%2foyzg.github.io%2farchives%2fdroid-slam%25E9%2598%2585%25E8%25AF%25BB%25E7%25AC%2594%25E8%25AE%25B0dense-bundle-adjustment%25E4%25B8%258E%25E6%25B7%25B1%25E5%25BA%25A6slam%2f">
+        <svg version="1.1" xml:space="preserve" viewBox="2 2 28 28">
+            <path
+                d="M26.49,29.86H5.5a3.37,3.37,0,0,1-2.47-1,3.35,3.35,0,0,1-1-2.47V5.48A3.36,3.36,0,0,1,3,3,3.37,3.37,0,0,1,5.5,2h21A3.38,3.38,0,0,1,29,3a3.36,3.36,0,0,1,1,2.46V26.37a3.35,3.35,0,0,1-1,2.47A3.38,3.38,0,0,1,26.49,29.86Zm-5.38-6.71a.79.79,0,0,0,.85-.66L24.73,9.24a.55.55,0,0,0-.18-.46.62.62,0,0,0-.41-.17q-.08,0-16.53,6.11a.59.59,0,0,0-.41.59.57.57,0,0,0,.43.52l4,1.24,1.61,4.83a.62.62,0,0,0,.63.43.56.56,0,0,0,.4-.17L16.54,20l4.09,3A.9.9,0,0,0,21.11,23.15ZM13.8,20.71l-1.21-4q8.72-5.55,8.78-5.55c.15,0,.23,0,.23.16a.18.18,0,0,1,0,.06s-2.51,2.3-7.52,6.8Z" />
+        </svg>
+    </a>
+</div>
+
+  </footer>
+</article>
+    </main><footer class="footer">
+    <span>&copy; 2026 <a href="https://oyzg.github.io/">oyzg&#39;s note</a></span>
+    <span>&middot;</span>
+    <span>Powered by <a href="https://gohugo.io/" rel="noopener noreferrer" target="_blank">Hugo</a></span>
+    <span>&middot;</span>
+    <span>Theme <a href="https://git.io/hugopapermod" rel="noopener" target="_blank">PaperMod</a></span>
+</footer>
+<a href="#top" aria-label="go to top" title="Go to Top (Alt + G)">
+    <button class="top-link" id="top-link" type="button" accesskey="g">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 12 6" fill="currentColor">
+            <path d="M12 6H0l6-6z" />
+        </svg>
+    </button>
+</a>
+
+
+
+<script defer src="/assets/js/highlight.min.2eadbb982468c11a433a3e291f01326f2ba43f065e256bf792dbd79640a92316.js" integrity="sha256-Lq27mCRowRpDOj4pHwEybyukPwZeJWv3ktvXlkCpIxY="
+    onload="hljs.initHighlightingOnLoad();"></script>
+<script>
+    window.onload = function () {
+        if (localStorage.getItem("menu-scroll-position")) {
+            document.getElementById('menu').scrollLeft = localStorage.getItem("menu-scroll-position");
+        }
+    }
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener("click", function (e) {
+            e.preventDefault();
+            var id = this.getAttribute("href").substr(1);
+            if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView({
+                    behavior: "smooth"
+                });
+            } else {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView();
+            }
+            if (id === "top") {
+                history.replaceState(null, null, " ");
+            } else {
+                history.pushState(null, null, `#${id}`);
+            }
+        });
+    });
+    var mybutton = document.getElementById("top-link");
+    window.onscroll = function () {
+        if (document.body.scrollTop > 800 || document.documentElement.scrollTop > 800) {
+            mybutton.style.visibility = "visible";
+            mybutton.style.opacity = "1";
+        } else {
+            mybutton.style.visibility = "hidden";
+            mybutton.style.opacity = "0";
+        }
+    };
+
+    function menu_on_scroll() {
+        localStorage.setItem("menu-scroll-position", document.getElementById('menu').scrollLeft);
+    }
+
+</script>
+<script>
+    document.getElementById("theme-toggle").addEventListener("click", () => {
+        if (document.body.className.includes("dark")) {
+            document.body.classList.remove('dark');
+            localStorage.setItem("pref-theme", 'light');
+        } else {
+            document.body.classList.add('dark');
+            localStorage.setItem("pref-theme", 'dark');
+        }
+    })
+
+</script>
+
+</body>
+
+</html>
