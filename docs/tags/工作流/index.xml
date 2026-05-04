@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>工作流 on oyzg&#39;s note</title>
+    <link>https://oyzg.github.io/tags/%E5%B7%A5%E4%BD%9C%E6%B5%81/</link>
+    <description>Recent content in 工作流 on oyzg&#39;s note</description>
+    <generator>Hugo</generator>
+    <language>en-us</language>
+    <lastBuildDate>Sun, 08 Feb 2026 20:00:00 +0800</lastBuildDate>
+    <atom:link href="https://oyzg.github.io/tags/%E5%B7%A5%E4%BD%9C%E6%B5%81/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Skill笔记：把经验写成可复用的Agent能力</title>
+      <link>https://oyzg.github.io/archives/skill%E7%AC%94%E8%AE%B0%E6%8A%8A%E7%BB%8F%E9%AA%8C%E5%86%99%E6%88%90%E5%8F%AF%E5%A4%8D%E7%94%A8%E7%9A%84agent%E8%83%BD%E5%8A%9B/</link>
+      <pubDate>Sun, 08 Feb 2026 20:00:00 +0800</pubDate>
+      <guid>https://oyzg.github.io/archives/skill%E7%AC%94%E8%AE%B0%E6%8A%8A%E7%BB%8F%E9%AA%8C%E5%86%99%E6%88%90%E5%8F%AF%E5%A4%8D%E7%94%A8%E7%9A%84agent%E8%83%BD%E5%8A%9B/</guid>
+      <description>整理Skill的基本理解：它和prompt、RAG、MCP的区别，以及为什么适合沉淀可复用任务经验。</description>
+    </item>
+  </channel>
+</rss>

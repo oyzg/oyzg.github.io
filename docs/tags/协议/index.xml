@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>协议 on oyzg&#39;s note</title>
+    <link>https://oyzg.github.io/tags/%E5%8D%8F%E8%AE%AE/</link>
+    <description>Recent content in 协议 on oyzg&#39;s note</description>
+    <generator>Hugo</generator>
+    <language>en-us</language>
+    <lastBuildDate>Sun, 11 Jan 2026 20:00:00 +0800</lastBuildDate>
+    <atom:link href="https://oyzg.github.io/tags/%E5%8D%8F%E8%AE%AE/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>MCP笔记：Agent和外部工具之间的协议层</title>
+      <link>https://oyzg.github.io/archives/mcp%E7%AC%94%E8%AE%B0agent%E5%92%8C%E5%A4%96%E9%83%A8%E5%B7%A5%E5%85%B7%E4%B9%8B%E9%97%B4%E7%9A%84%E5%8D%8F%E8%AE%AE%E5%B1%82/</link>
+      <pubDate>Sun, 11 Jan 2026 20:00:00 +0800</pubDate>
+      <guid>https://oyzg.github.io/archives/mcp%E7%AC%94%E8%AE%B0agent%E5%92%8C%E5%A4%96%E9%83%A8%E5%B7%A5%E5%85%B7%E4%B9%8B%E9%97%B4%E7%9A%84%E5%8D%8F%E8%AE%AE%E5%B1%82/</guid>
+      <description>整理MCP的基本概念：client、server、tools、resources、prompts，以及它为什么适合作为Agent工具协议。</description>
+    </item>
+  </channel>
+</rss>

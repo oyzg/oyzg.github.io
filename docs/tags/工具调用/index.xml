@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>工具调用 on oyzg&#39;s note</title>
+    <link>https://oyzg.github.io/tags/%E5%B7%A5%E5%85%B7%E8%B0%83%E7%94%A8/</link>
+    <description>Recent content in 工具调用 on oyzg&#39;s note</description>
+    <generator>Hugo</generator>
+    <language>en-us</language>
+    <lastBuildDate>Sun, 07 Dec 2025 20:00:00 +0800</lastBuildDate>
+    <atom:link href="https://oyzg.github.io/tags/%E5%B7%A5%E5%85%B7%E8%B0%83%E7%94%A8/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Agent笔记：ReAct、工具调用和任务循环</title>
+      <link>https://oyzg.github.io/archives/agent%E7%AC%94%E8%AE%B0react%E5%B7%A5%E5%85%B7%E8%B0%83%E7%94%A8%E5%92%8C%E4%BB%BB%E5%8A%A1%E5%BE%AA%E7%8E%AF/</link>
+      <pubDate>Sun, 07 Dec 2025 20:00:00 +0800</pubDate>
+      <guid>https://oyzg.github.io/archives/agent%E7%AC%94%E8%AE%B0react%E5%B7%A5%E5%85%B7%E8%B0%83%E7%94%A8%E5%92%8C%E4%BB%BB%E5%8A%A1%E5%BE%AA%E7%8E%AF/</guid>
+      <description>整理Agent的基本循环：推理、行动、观察、工具反馈、状态管理和失败重试。</description>
+    </item>
+  </channel>
+</rss>

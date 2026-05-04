@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Coding Agent on oyzg&#39;s note</title>
+    <link>https://oyzg.github.io/tags/coding-agent/</link>
+    <description>Recent content in Coding Agent on oyzg&#39;s note</description>
+    <generator>Hugo</generator>
+    <language>en-us</language>
+    <lastBuildDate>Sat, 02 May 2026 20:00:00 +0800</lastBuildDate>
+    <atom:link href="https://oyzg.github.io/tags/coding-agent/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Claude Code笔记：源码泄漏后再看代码Agent</title>
+      <link>https://oyzg.github.io/archives/claude-code%E7%AC%94%E8%AE%B0%E6%BA%90%E7%A0%81%E6%B3%84%E6%BC%8F%E5%90%8E%E5%86%8D%E7%9C%8B%E4%BB%A3%E7%A0%81agent/</link>
+      <pubDate>Sat, 02 May 2026 20:00:00 +0800</pubDate>
+      <guid>https://oyzg.github.io/archives/claude-code%E7%AC%94%E8%AE%B0%E6%BA%90%E7%A0%81%E6%B3%84%E6%BC%8F%E5%90%8E%E5%86%8D%E7%9C%8B%E4%BB%A3%E7%A0%81agent/</guid>
+      <description>结合Claude Code源码泄漏事件，重新理解代码Agent的外壳系统：工具组织、权限控制、编辑执行循环和上下文管理。</description>
+    </item>
+  </channel>
+</rss>

@@ -1,0 +1,487 @@
+<!DOCTYPE html>
+<html lang="en" dir="auto">
+
+<head><meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<meta name="robots" content="index, follow">
+<title>Skill笔记：把经验写成可复用的Agent能力 | oyzg&#39;s note</title>
+
+<meta name="keywords" content="Agent, Skill, Claude, Codex, 工作流" />
+<meta name="description" content="整理Skill的基本理解：它和prompt、RAG、MCP的区别，以及为什么适合沉淀可复用任务经验。">
+<meta name="author" content="">
+<link rel="canonical" href="https://oyzg.github.io/archives/skill%E7%AC%94%E8%AE%B0%E6%8A%8A%E7%BB%8F%E9%AA%8C%E5%86%99%E6%88%90%E5%8F%AF%E5%A4%8D%E7%94%A8%E7%9A%84agent%E8%83%BD%E5%8A%9B/" />
+<link href="/assets/css/stylesheet.min.d597aab94c71b49b163b6ac67c7958079589ea1a0b7300e8a0014e1d2023b95e.css" integrity="sha256-1ZequUxxtJsWO2rGfHlYB5WJ6hoLcwDooAFOHSAjuV4=" rel="preload stylesheet"
+    as="style">
+
+<link rel="icon" href="https://oyzg.github.io/favicon.ico">
+<link rel="icon" type="image/png" sizes="16x16" href="https://oyzg.github.io/favicon-16x16.png">
+<link rel="icon" type="image/png" sizes="32x32" href="https://oyzg.github.io/favicon-32x32.png">
+<link rel="apple-touch-icon" href="https://oyzg.github.io/apple-touch-icon.png">
+<link rel="mask-icon" href="https://oyzg.github.io/safari-pinned-tab.svg">
+<meta name="theme-color" content="#2e2e33">
+<meta name="msapplication-TileColor" content="#2e2e33">
+<meta name="generator" content="Hugo 0.147.4">
+<link rel="alternate" hreflang="en" href="https://oyzg.github.io/archives/skill%E7%AC%94%E8%AE%B0%E6%8A%8A%E7%BB%8F%E9%AA%8C%E5%86%99%E6%88%90%E5%8F%AF%E5%A4%8D%E7%94%A8%E7%9A%84agent%E8%83%BD%E5%8A%9B/" />
+
+
+
+<meta property="og:title" content="Skill笔记：把经验写成可复用的Agent能力" />
+<meta property="og:description" content="整理Skill的基本理解：它和prompt、RAG、MCP的区别，以及为什么适合沉淀可复用任务经验。" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://oyzg.github.io/archives/skill%E7%AC%94%E8%AE%B0%E6%8A%8A%E7%BB%8F%E9%AA%8C%E5%86%99%E6%88%90%E5%8F%AF%E5%A4%8D%E7%94%A8%E7%9A%84agent%E8%83%BD%E5%8A%9B/" />
+<meta property="article:published_time" content="2026-02-08T20:00:00+08:00" />
+<meta property="article:modified_time" content="2026-02-08T20:00:00+08:00" />
+
+<meta name="twitter:card" content="summary"/>
+<meta name="twitter:title" content="Skill笔记：把经验写成可复用的Agent能力"/>
+<meta name="twitter:description" content="整理Skill的基本理解：它和prompt、RAG、MCP的区别，以及为什么适合沉淀可复用任务经验。"/>
+
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position":  1 ,
+      "name": "Skill笔记：把经验写成可复用的Agent能力",
+      "item": "https://oyzg.github.io/archives/skill%E7%AC%94%E8%AE%B0%E6%8A%8A%E7%BB%8F%E9%AA%8C%E5%86%99%E6%88%90%E5%8F%AF%E5%A4%8D%E7%94%A8%E7%9A%84agent%E8%83%BD%E5%8A%9B/"
+    }
+  ]
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": "Skill笔记：把经验写成可复用的Agent能力",
+  "name": "Skill笔记：把经验写成可复用的Agent能力",
+  "description": "整理Skill的基本理解：它和prompt、RAG、MCP的区别，以及为什么适合沉淀可复用任务经验。",
+  "keywords": [
+    "Agent", "Skill", "Claude", "Codex", "工作流"
+  ],
+  "articleBody": "Skill笔记：把经验写成可复用的Agent能力 最近看 Agent 工具时，经常看到 Skill 这个概念。Claude 有 Skills，Codex 里也有技能机制，Hermes Agent 也强调从经验里创建和改进 skills。\n我现在的理解：Skill 不是简单 prompt，也不是知识库，而是给 Agent 按需加载的一组任务经验。它可以包括说明、约束、脚本、模板、资源和工作流。\n为什么需要Skill 如果每次都把所有规则塞进系统 prompt，会有几个问题：\n上下文变长。 不相关规则干扰当前任务。 更新经验不方便。 很难复用一套流程。 如果只靠 RAG，检索到的是知识片段，不一定能告诉 Agent 怎么完成任务。\nSkill 的作用是把一类任务的经验打包起来。比如：\n怎么写周报。 怎么做代码 review。 怎么生成 PPT。 怎么分析 Excel。 怎么按项目规范发布版本。 怎么调试某类服务。 当任务触发这个技能时，Agent 加载对应说明和资源，然后按里面的流程执行。\nSkill和Prompt Prompt 是一次请求里的指令。Skill 更像长期维护的任务包。\nPrompt 可以这样写：\n帮我把这份文档改得更自然。 Skill 则会规定：\n什么情况下使用。 处理步骤是什么。 需要遵守哪些风格。 有哪些模板可以复用。 遇到异常怎么处理。 结果如何检查。 所以 Skill 比 prompt 更稳定，也更适合团队或个人长期沉淀。\n我觉得最关键的是触发条件。一个好的 Skill 不能只写一堆规则，还要告诉 Agent 什么时候该用、什么时候不该用。否则要么根本用不上，要么什么任务都乱触发。\nSkill和RAG RAG 主要解决“查资料”。Skill 主要解决“怎么做事”。\n比如我问项目里某个接口怎么用，RAG 可以从文档里找接口说明。\n但如果我要“按照团队规范写一篇事故复盘”，RAG 找到几篇历史复盘不一定够，还需要知道固定结构、注意事项、检查清单、措辞风格。这更像 Skill。\n当然 Skill 里也可以引用资料。比如一个 weekly-report skill 可以带模板文件，一个 slides skill 可以带生成脚本，一个 code-review skill 可以提示去查项目规范。\n可以粗略记成：\nRAG：取回相关知识。 Skill：加载任务流程和经验。 Skill和MCP MCP 是工具协议，Skill 是任务经验。\nMCP server 可以提供工具：\n读文件。 查 GitHub。 运行数据库查询。 创建日历事件。 Skill 会告诉 Agent 在某类任务中怎么使用这些工具：\n先查哪些信息。 哪些操作需要确认。 出错时怎么回退。 最终结果怎么组织。 所以 Skill 和 MCP 是互补关系。MCP 让 Agent 有手，Skill 告诉 Agent 这类活怎么干。\n如果只有 MCP，没有 Skill，Agent 可能知道有很多工具，但不知道完成任务的最佳流程。如果只有 Skill，没有工具，Agent 只能停留在文本建议。\nSkill的结构 一个比较实用的 Skill 通常包括：\n名称和描述。 触发条件。 使用流程。 输入要求。 输出格式。 禁止事项。 可选脚本或模板。 验证清单。 在 Codex 的技能机制里，SKILL.md 通常是入口。Agent 先读技能说明，只在需要时再加载脚本、模板或参考文件。这种“渐进加载”很重要。\n如果一个 Skill 一上来就把所有资料全塞进上下文，反而失去意义。好的 Skill 应该先给最小必要说明，再按任务需要展开。\n技能的粒度 Skill 不能太大，也不能太碎。\n太大的 Skill 会变成一本手册。Agent 读了半天，当前任务只用其中一点。\n太碎的 Skill 又会导致触发和选择困难。比如把“写 PR 描述”“列变更点”“写测试说明”拆成三个技能，可能不如合成一个“发布 PR”技能。\n我更倾向于按任务闭环拆 Skill。一个 Skill 应该能覆盖一类自然任务，从输入到输出形成完整流程。\n比如：\ngithub:yeet：把本地变更发布到 GitHub。 documents：编辑 Word 文档。 spreadsheets：处理表格。 humanizer：把文本改得更像人写。 这些技能的边界都比较清楚。\n技能沉淀 Skill 最大的价值是沉淀经验。\n很多工作不是一次性解决，而是反复出现。每次都靠 prompt 重新描述，会浪费时间，也容易遗漏细节。如果把经验整理成 Skill，后面就能复用。\n比如一个项目发布流程，第一次可能需要人一步步提醒：\n先跑测试。 再构建。 再检查 git diff。 不要提交 .DS_Store。 最后 commit 和 push。 这些规则沉淀成 Skill 后，Agent 下次遇到类似任务就能主动执行。\n这也是 Hermes Agent 自学习里 skills 的意义：把完成任务后的经验转成可复用技能，让系统越用越贴合用户。\n风险 Skill 也可能带来问题。\n第一，过期。项目流程变了，旧 Skill 还在按旧方式执行。\n第二，误触发。任务只是类似，但 Skill 被错误加载，结果带偏。\n第三，规则冲突。多个 Skill 都适用，但要求不同。\n第四，权限扩大。Skill 如果包含危险操作流程，可能让 Agent 更容易执行高风险动作。\n所以 Skill 需要版本管理和定期清理。它不是写完就永远正确。\n记录 Skill 可以先理解成 Agent 的“经验包”。\n它和几个概念的区别：\nPrompt：一次性指令。 RAG：检索知识。 MCP：连接工具。 Skill：沉淀任务流程。 真正有价值的 Skill 应该来自反复做过的任务，而不是凭空写一堆规范。用过、踩过坑、修正过，再沉淀下来，这样才会让 Agent 变得更可靠。\n参考 Claude Skills Anthropic: Equip Claude with new skills Model Context Protocol Documentation Hermes Agent Documentation ",
+  "wordCount" : "254",
+  "inLanguage": "en",
+  "datePublished": "2026-02-08T20:00:00+08:00",
+  "dateModified": "2026-02-08T20:00:00+08:00",
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id": "https://oyzg.github.io/archives/skill%E7%AC%94%E8%AE%B0%E6%8A%8A%E7%BB%8F%E9%AA%8C%E5%86%99%E6%88%90%E5%8F%AF%E5%A4%8D%E7%94%A8%E7%9A%84agent%E8%83%BD%E5%8A%9B/"
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "oyzg's note",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "https://oyzg.github.io/favicon.ico"
+    }
+  }
+}
+</script>
+
+
+
+
+
+</head>
+
+<body class="" id="top">
+<script>
+    if (localStorage.getItem("pref-theme") === "dark") {
+        document.body.classList.add('dark');
+    } else if (localStorage.getItem("pref-theme") === "light") {
+        document.body.classList.remove('dark')
+    } else if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+        document.body.classList.add('dark');
+    }
+
+</script>
+<noscript>
+    <style type="text/css">
+        #theme-toggle,
+        .top-link {
+            display: none;
+        }
+
+    </style>
+</noscript>
+<header class="header">
+    <nav class="nav">
+        <div class="logo">
+            <a href="https://oyzg.github.io/" accesskey="h" title="oyzg&#39;s note (Alt + H)">oyzg&#39;s note</a>
+            <span class="logo-switches">
+                <button id="theme-toggle" accesskey="t" title="(Alt + T)">
+                    <svg id="moon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                    </svg>
+                    <svg id="sun" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="5"></circle>
+                        <line x1="12" y1="1" x2="12" y2="3"></line>
+                        <line x1="12" y1="21" x2="12" y2="23"></line>
+                        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                        <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                        <line x1="1" y1="12" x2="3" y2="12"></line>
+                        <line x1="21" y1="12" x2="23" y2="12"></line>
+                        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                        <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+                    </svg>
+                </button>
+                
+                
+
+                <ul class="lang-switch"><li>|</li>
+                </ul>
+            </span>
+        </div>
+        <ul id="menu" onscroll="menu_on_scroll()">
+            <li>
+                <a href="https://oyzg.github.io/archives/" title="Archive">
+                    <span>Archive</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://oyzg.github.io/categories/" title="Categories">
+                    <span>Categories</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://oyzg.github.io/series/" title="Series">
+                    <span>Series</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://oyzg.github.io/tags/" title="Tags">
+                    <span>Tags</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://oyzg.github.io/search/" title="Search (Alt &#43; /)" accesskey=/>
+                    <span>Search</span>
+                </a>
+            </li></ul>
+    </nav>
+</header>
+
+    <main class="main">
+
+<article class="post-single">
+  <header class="post-header">
+
+    <h1 class="post-title">
+      Skill笔记：把经验写成可复用的Agent能力
+    </h1>
+    <div class="post-meta">February 8, 2026 · 2 min
+
+</div>
+  </header> 
+
+  <div class="toc">
+    <details >
+      <summary accesskey="c" title="(Alt + C)">
+        <div class="details">Table of Contents</div>
+      </summary>
+      <div class="inner"><ul><li>
+        <a href="#skill%e7%ac%94%e8%ae%b0%e6%8a%8a%e7%bb%8f%e9%aa%8c%e5%86%99%e6%88%90%e5%8f%af%e5%a4%8d%e7%94%a8%e7%9a%84agent%e8%83%bd%e5%8a%9b" aria-label="Skill笔记：把经验写成可复用的Agent能力">Skill笔记：把经验写成可复用的Agent能力</a><ul>
+            <li>
+        <a href="#%e4%b8%ba%e4%bb%80%e4%b9%88%e9%9c%80%e8%a6%81skill" aria-label="为什么需要Skill">为什么需要Skill</a></li><li>
+        <a href="#skill%e5%92%8cprompt" aria-label="Skill和Prompt">Skill和Prompt</a></li><li>
+        <a href="#skill%e5%92%8crag" aria-label="Skill和RAG">Skill和RAG</a></li><li>
+        <a href="#skill%e5%92%8cmcp" aria-label="Skill和MCP">Skill和MCP</a></li><li>
+        <a href="#skill%e7%9a%84%e7%bb%93%e6%9e%84" aria-label="Skill的结构">Skill的结构</a></li><li>
+        <a href="#%e6%8a%80%e8%83%bd%e7%9a%84%e7%b2%92%e5%ba%a6" aria-label="技能的粒度">技能的粒度</a></li><li>
+        <a href="#%e6%8a%80%e8%83%bd%e6%b2%89%e6%b7%80" aria-label="技能沉淀">技能沉淀</a></li><li>
+        <a href="#%e9%a3%8e%e9%99%a9" aria-label="风险">风险</a></li><li>
+        <a href="#%e8%ae%b0%e5%bd%95" aria-label="记录">记录</a></li><li>
+        <a href="#%e5%8f%82%e8%80%83" aria-label="参考">参考</a></li></ul>
+</li></ul>
+      </div>
+    </details>
+  </div>
+  <div class="post-content">
+    
+<h1 id="skill笔记把经验写成可复用的agent能力">Skill笔记：把经验写成可复用的Agent能力<a hidden class="anchor" aria-hidden="true" href="#skill笔记把经验写成可复用的agent能力">#</a></h1>
+<p>最近看 Agent 工具时，经常看到 Skill 这个概念。Claude 有 Skills，Codex 里也有技能机制，Hermes Agent 也强调从经验里创建和改进 skills。</p>
+<p>我现在的理解：Skill 不是简单 prompt，也不是知识库，而是给 Agent 按需加载的一组任务经验。它可以包括说明、约束、脚本、模板、资源和工作流。</p>
+<h2 id="为什么需要skill">为什么需要Skill<a hidden class="anchor" aria-hidden="true" href="#为什么需要skill">#</a></h2>
+<p>如果每次都把所有规则塞进系统 prompt，会有几个问题：</p>
+<ul>
+<li>上下文变长。</li>
+<li>不相关规则干扰当前任务。</li>
+<li>更新经验不方便。</li>
+<li>很难复用一套流程。</li>
+</ul>
+<p>如果只靠 RAG，检索到的是知识片段，不一定能告诉 Agent 怎么完成任务。</p>
+<p>Skill 的作用是把一类任务的经验打包起来。比如：</p>
+<ul>
+<li>怎么写周报。</li>
+<li>怎么做代码 review。</li>
+<li>怎么生成 PPT。</li>
+<li>怎么分析 Excel。</li>
+<li>怎么按项目规范发布版本。</li>
+<li>怎么调试某类服务。</li>
+</ul>
+<p>当任务触发这个技能时，Agent 加载对应说明和资源，然后按里面的流程执行。</p>
+<h2 id="skill和prompt">Skill和Prompt<a hidden class="anchor" aria-hidden="true" href="#skill和prompt">#</a></h2>
+<p>Prompt 是一次请求里的指令。Skill 更像长期维护的任务包。</p>
+<p>Prompt 可以这样写：</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-text" data-lang="text"><span style="display:flex;"><span>帮我把这份文档改得更自然。
+</span></span></code></pre></div><p>Skill 则会规定：</p>
+<ul>
+<li>什么情况下使用。</li>
+<li>处理步骤是什么。</li>
+<li>需要遵守哪些风格。</li>
+<li>有哪些模板可以复用。</li>
+<li>遇到异常怎么处理。</li>
+<li>结果如何检查。</li>
+</ul>
+<p>所以 Skill 比 prompt 更稳定，也更适合团队或个人长期沉淀。</p>
+<p>我觉得最关键的是触发条件。一个好的 Skill 不能只写一堆规则，还要告诉 Agent 什么时候该用、什么时候不该用。否则要么根本用不上，要么什么任务都乱触发。</p>
+<h2 id="skill和rag">Skill和RAG<a hidden class="anchor" aria-hidden="true" href="#skill和rag">#</a></h2>
+<p>RAG 主要解决“查资料”。Skill 主要解决“怎么做事”。</p>
+<p>比如我问项目里某个接口怎么用，RAG 可以从文档里找接口说明。</p>
+<p>但如果我要“按照团队规范写一篇事故复盘”，RAG 找到几篇历史复盘不一定够，还需要知道固定结构、注意事项、检查清单、措辞风格。这更像 Skill。</p>
+<p>当然 Skill 里也可以引用资料。比如一个 <code>weekly-report</code> skill 可以带模板文件，一个 <code>slides</code> skill 可以带生成脚本，一个 <code>code-review</code> skill 可以提示去查项目规范。</p>
+<p>可以粗略记成：</p>
+<ul>
+<li>RAG：取回相关知识。</li>
+<li>Skill：加载任务流程和经验。</li>
+</ul>
+<h2 id="skill和mcp">Skill和MCP<a hidden class="anchor" aria-hidden="true" href="#skill和mcp">#</a></h2>
+<p>MCP 是工具协议，Skill 是任务经验。</p>
+<p>MCP server 可以提供工具：</p>
+<ul>
+<li>读文件。</li>
+<li>查 GitHub。</li>
+<li>运行数据库查询。</li>
+<li>创建日历事件。</li>
+</ul>
+<p>Skill 会告诉 Agent 在某类任务中怎么使用这些工具：</p>
+<ul>
+<li>先查哪些信息。</li>
+<li>哪些操作需要确认。</li>
+<li>出错时怎么回退。</li>
+<li>最终结果怎么组织。</li>
+</ul>
+<p>所以 Skill 和 MCP 是互补关系。MCP 让 Agent 有手，Skill 告诉 Agent 这类活怎么干。</p>
+<p>如果只有 MCP，没有 Skill，Agent 可能知道有很多工具，但不知道完成任务的最佳流程。如果只有 Skill，没有工具，Agent 只能停留在文本建议。</p>
+<h2 id="skill的结构">Skill的结构<a hidden class="anchor" aria-hidden="true" href="#skill的结构">#</a></h2>
+<p>一个比较实用的 Skill 通常包括：</p>
+<ul>
+<li>名称和描述。</li>
+<li>触发条件。</li>
+<li>使用流程。</li>
+<li>输入要求。</li>
+<li>输出格式。</li>
+<li>禁止事项。</li>
+<li>可选脚本或模板。</li>
+<li>验证清单。</li>
+</ul>
+<p>在 Codex 的技能机制里，<code>SKILL.md</code> 通常是入口。Agent 先读技能说明，只在需要时再加载脚本、模板或参考文件。这种“渐进加载”很重要。</p>
+<p>如果一个 Skill 一上来就把所有资料全塞进上下文，反而失去意义。好的 Skill 应该先给最小必要说明，再按任务需要展开。</p>
+<h2 id="技能的粒度">技能的粒度<a hidden class="anchor" aria-hidden="true" href="#技能的粒度">#</a></h2>
+<p>Skill 不能太大，也不能太碎。</p>
+<p>太大的 Skill 会变成一本手册。Agent 读了半天，当前任务只用其中一点。</p>
+<p>太碎的 Skill 又会导致触发和选择困难。比如把“写 PR 描述”“列变更点”“写测试说明”拆成三个技能，可能不如合成一个“发布 PR”技能。</p>
+<p>我更倾向于按任务闭环拆 Skill。一个 Skill 应该能覆盖一类自然任务，从输入到输出形成完整流程。</p>
+<p>比如：</p>
+<ul>
+<li><code>github:yeet</code>：把本地变更发布到 GitHub。</li>
+<li><code>documents</code>：编辑 Word 文档。</li>
+<li><code>spreadsheets</code>：处理表格。</li>
+<li><code>humanizer</code>：把文本改得更像人写。</li>
+</ul>
+<p>这些技能的边界都比较清楚。</p>
+<h2 id="技能沉淀">技能沉淀<a hidden class="anchor" aria-hidden="true" href="#技能沉淀">#</a></h2>
+<p>Skill 最大的价值是沉淀经验。</p>
+<p>很多工作不是一次性解决，而是反复出现。每次都靠 prompt 重新描述，会浪费时间，也容易遗漏细节。如果把经验整理成 Skill，后面就能复用。</p>
+<p>比如一个项目发布流程，第一次可能需要人一步步提醒：</p>
+<ul>
+<li>先跑测试。</li>
+<li>再构建。</li>
+<li>再检查 git diff。</li>
+<li>不要提交 <code>.DS_Store</code>。</li>
+<li>最后 commit 和 push。</li>
+</ul>
+<p>这些规则沉淀成 Skill 后，Agent 下次遇到类似任务就能主动执行。</p>
+<p>这也是 Hermes Agent 自学习里 skills 的意义：把完成任务后的经验转成可复用技能，让系统越用越贴合用户。</p>
+<h2 id="风险">风险<a hidden class="anchor" aria-hidden="true" href="#风险">#</a></h2>
+<p>Skill 也可能带来问题。</p>
+<p>第一，过期。项目流程变了，旧 Skill 还在按旧方式执行。</p>
+<p>第二，误触发。任务只是类似，但 Skill 被错误加载，结果带偏。</p>
+<p>第三，规则冲突。多个 Skill 都适用，但要求不同。</p>
+<p>第四，权限扩大。Skill 如果包含危险操作流程，可能让 Agent 更容易执行高风险动作。</p>
+<p>所以 Skill 需要版本管理和定期清理。它不是写完就永远正确。</p>
+<h2 id="记录">记录<a hidden class="anchor" aria-hidden="true" href="#记录">#</a></h2>
+<p>Skill 可以先理解成 Agent 的“经验包”。</p>
+<p>它和几个概念的区别：</p>
+<ul>
+<li>Prompt：一次性指令。</li>
+<li>RAG：检索知识。</li>
+<li>MCP：连接工具。</li>
+<li>Skill：沉淀任务流程。</li>
+</ul>
+<p>真正有价值的 Skill 应该来自反复做过的任务，而不是凭空写一堆规范。用过、踩过坑、修正过，再沉淀下来，这样才会让 Agent 变得更可靠。</p>
+<h2 id="参考">参考<a hidden class="anchor" aria-hidden="true" href="#参考">#</a></h2>
+<ul>
+<li><a href="https://support.claude.com/en/articles/12512176-what-are-skills">Claude Skills</a></li>
+<li><a href="https://www.anthropic.com/news/skills">Anthropic: Equip Claude with new skills</a></li>
+<li><a href="https://modelcontextprotocol.io/">Model Context Protocol Documentation</a></li>
+<li><a href="https://hermes-agent.nousresearch.com/docs/">Hermes Agent Documentation</a></li>
+</ul>
+
+</div>
+  <footer class="post-footer">
+    <ul class="post-tags">
+      <li><a href="https://oyzg.github.io/tags/agent/">Agent</a></li>
+      <li><a href="https://oyzg.github.io/tags/skill/">Skill</a></li>
+      <li><a href="https://oyzg.github.io/tags/claude/">Claude</a></li>
+      <li><a href="https://oyzg.github.io/tags/codex/">Codex</a></li>
+      <li><a href="https://oyzg.github.io/tags/%E5%B7%A5%E4%BD%9C%E6%B5%81/">工作流</a></li>
+    </ul>
+    <nav class="paginav">
+      <a class="prev" href="https://oyzg.github.io/archives/agent-memory%E7%AC%94%E8%AE%B0%E9%95%BF%E6%9C%9F%E8%AE%B0%E5%BF%86%E4%B8%BA%E4%BB%80%E4%B9%88%E4%B8%8D%E5%8F%AA%E6%98%AF%E9%95%BF%E4%B8%8A%E4%B8%8B%E6%96%87/">
+        <span class="title">« Prev Page</span>
+        <br>
+        <span>Agent Memory笔记：长期记忆为什么不只是长上下文</span>
+      </a>
+      <a class="next" href="https://oyzg.github.io/archives/mcp%E7%AC%94%E8%AE%B0agent%E5%92%8C%E5%A4%96%E9%83%A8%E5%B7%A5%E5%85%B7%E4%B9%8B%E9%97%B4%E7%9A%84%E5%8D%8F%E8%AE%AE%E5%B1%82/">
+        <span class="title">Next Page »</span>
+        <br>
+        <span>MCP笔记：Agent和外部工具之间的协议层</span>
+      </a>
+    </nav>
+
+
+
+
+
+
+<div class="share-buttons">
+    <a target="_blank" rel="noopener noreferrer" aria-label="share Skill笔记：把经验写成可复用的Agent能力 on twitter"
+        href="https://twitter.com/intent/tweet/?text=Skill%e7%ac%94%e8%ae%b0%ef%bc%9a%e6%8a%8a%e7%bb%8f%e9%aa%8c%e5%86%99%e6%88%90%e5%8f%af%e5%a4%8d%e7%94%a8%e7%9a%84Agent%e8%83%bd%e5%8a%9b&amp;url=https%3a%2f%2foyzg.github.io%2farchives%2fskill%25E7%25AC%2594%25E8%25AE%25B0%25E6%258A%258A%25E7%25BB%258F%25E9%25AA%258C%25E5%2586%2599%25E6%2588%2590%25E5%258F%25AF%25E5%25A4%258D%25E7%2594%25A8%25E7%259A%2584agent%25E8%2583%25BD%25E5%258A%259B%2f&amp;hashtags=Agent%2cSkill%2cClaude%2cCodex%2c%e5%b7%a5%e4%bd%9c%e6%b5%81">
+        <svg version="1.1" viewBox="0 0 512 512" xml:space="preserve">
+            <path
+                d="M449.446,0c34.525,0 62.554,28.03 62.554,62.554l0,386.892c0,34.524 -28.03,62.554 -62.554,62.554l-386.892,0c-34.524,0 -62.554,-28.03 -62.554,-62.554l0,-386.892c0,-34.524 28.029,-62.554 62.554,-62.554l386.892,0Zm-253.927,424.544c135.939,0 210.268,-112.643 210.268,-210.268c0,-3.218 0,-6.437 -0.153,-9.502c14.406,-10.421 26.973,-23.448 36.935,-38.314c-13.18,5.824 -27.433,9.809 -42.452,11.648c15.326,-9.196 26.973,-23.602 32.49,-40.92c-14.252,8.429 -30.038,14.56 -46.896,17.931c-13.487,-14.406 -32.644,-23.295 -53.946,-23.295c-40.767,0 -73.87,33.104 -73.87,73.87c0,5.824 0.613,11.494 1.992,16.858c-61.456,-3.065 -115.862,-32.49 -152.337,-77.241c-6.284,10.881 -9.962,23.601 -9.962,37.088c0,25.594 13.027,48.276 32.95,61.456c-12.107,-0.307 -23.448,-3.678 -33.41,-9.196l0,0.92c0,35.862 25.441,65.594 59.311,72.49c-6.13,1.686 -12.72,2.606 -19.464,2.606c-4.751,0 -9.348,-0.46 -13.946,-1.38c9.349,29.426 36.628,50.728 68.965,51.341c-25.287,19.771 -57.164,31.571 -91.8,31.571c-5.977,0 -11.801,-0.306 -17.625,-1.073c32.337,21.15 71.264,33.41 112.95,33.41Z" />
+        </svg>
+    </a>
+    <a target="_blank" rel="noopener noreferrer" aria-label="share Skill笔记：把经验写成可复用的Agent能力 on linkedin"
+        href="https://www.linkedin.com/shareArticle?mini=true&amp;url=https%3a%2f%2foyzg.github.io%2farchives%2fskill%25E7%25AC%2594%25E8%25AE%25B0%25E6%258A%258A%25E7%25BB%258F%25E9%25AA%258C%25E5%2586%2599%25E6%2588%2590%25E5%258F%25AF%25E5%25A4%258D%25E7%2594%25A8%25E7%259A%2584agent%25E8%2583%25BD%25E5%258A%259B%2f&amp;title=Skill%e7%ac%94%e8%ae%b0%ef%bc%9a%e6%8a%8a%e7%bb%8f%e9%aa%8c%e5%86%99%e6%88%90%e5%8f%af%e5%a4%8d%e7%94%a8%e7%9a%84Agent%e8%83%bd%e5%8a%9b&amp;summary=Skill%e7%ac%94%e8%ae%b0%ef%bc%9a%e6%8a%8a%e7%bb%8f%e9%aa%8c%e5%86%99%e6%88%90%e5%8f%af%e5%a4%8d%e7%94%a8%e7%9a%84Agent%e8%83%bd%e5%8a%9b&amp;source=https%3a%2f%2foyzg.github.io%2farchives%2fskill%25E7%25AC%2594%25E8%25AE%25B0%25E6%258A%258A%25E7%25BB%258F%25E9%25AA%258C%25E5%2586%2599%25E6%2588%2590%25E5%258F%25AF%25E5%25A4%258D%25E7%2594%25A8%25E7%259A%2584agent%25E8%2583%25BD%25E5%258A%259B%2f">
+        <svg version="1.1" viewBox="0 0 512 512" xml:space="preserve">
+            <path
+                d="M449.446,0c34.525,0 62.554,28.03 62.554,62.554l0,386.892c0,34.524 -28.03,62.554 -62.554,62.554l-386.892,0c-34.524,0 -62.554,-28.03 -62.554,-62.554l0,-386.892c0,-34.524 28.029,-62.554 62.554,-62.554l386.892,0Zm-288.985,423.278l0,-225.717l-75.04,0l0,225.717l75.04,0Zm270.539,0l0,-129.439c0,-69.333 -37.018,-101.586 -86.381,-101.586c-39.804,0 -57.634,21.891 -67.617,37.266l0,-31.958l-75.021,0c0.995,21.181 0,225.717 0,225.717l75.02,0l0,-126.056c0,-6.748 0.486,-13.492 2.474,-18.315c5.414,-13.475 17.767,-27.434 38.494,-27.434c27.135,0 38.007,20.707 38.007,51.037l0,120.768l75.024,0Zm-307.552,-334.556c-25.674,0 -42.448,16.879 -42.448,39.002c0,21.658 16.264,39.002 41.455,39.002l0.484,0c26.165,0 42.452,-17.344 42.452,-39.002c-0.485,-22.092 -16.241,-38.954 -41.943,-39.002Z" />
+        </svg>
+    </a>
+    <a target="_blank" rel="noopener noreferrer" aria-label="share Skill笔记：把经验写成可复用的Agent能力 on reddit"
+        href="https://reddit.com/submit?url=https%3a%2f%2foyzg.github.io%2farchives%2fskill%25E7%25AC%2594%25E8%25AE%25B0%25E6%258A%258A%25E7%25BB%258F%25E9%25AA%258C%25E5%2586%2599%25E6%2588%2590%25E5%258F%25AF%25E5%25A4%258D%25E7%2594%25A8%25E7%259A%2584agent%25E8%2583%25BD%25E5%258A%259B%2f&title=Skill%e7%ac%94%e8%ae%b0%ef%bc%9a%e6%8a%8a%e7%bb%8f%e9%aa%8c%e5%86%99%e6%88%90%e5%8f%af%e5%a4%8d%e7%94%a8%e7%9a%84Agent%e8%83%bd%e5%8a%9b">
+        <svg version="1.1" viewBox="0 0 512 512" xml:space="preserve">
+            <path
+                d="M449.446,0c34.525,0 62.554,28.03 62.554,62.554l0,386.892c0,34.524 -28.03,62.554 -62.554,62.554l-386.892,0c-34.524,0 -62.554,-28.03 -62.554,-62.554l0,-386.892c0,-34.524 28.029,-62.554 62.554,-62.554l386.892,0Zm-3.446,265.638c0,-22.964 -18.616,-41.58 -41.58,-41.58c-11.211,0 -21.361,4.457 -28.841,11.666c-28.424,-20.508 -67.586,-33.757 -111.204,-35.278l18.941,-89.121l61.884,13.157c0.756,15.734 13.642,28.29 29.56,28.29c16.407,0 29.706,-13.299 29.706,-29.701c0,-16.403 -13.299,-29.702 -29.706,-29.702c-11.666,0 -21.657,6.792 -26.515,16.578l-69.105,-14.69c-1.922,-0.418 -3.939,-0.042 -5.585,1.036c-1.658,1.073 -2.811,2.761 -3.224,4.686l-21.152,99.438c-44.258,1.228 -84.046,14.494 -112.837,35.232c-7.468,-7.164 -17.589,-11.591 -28.757,-11.591c-22.965,0 -41.585,18.616 -41.585,41.58c0,16.896 10.095,31.41 24.568,37.918c-0.639,4.135 -0.99,8.328 -0.99,12.576c0,63.977 74.469,115.836 166.33,115.836c91.861,0 166.334,-51.859 166.334,-115.836c0,-4.218 -0.347,-8.387 -0.977,-12.493c14.564,-6.47 24.735,-21.034 24.735,-38.001Zm-119.474,108.193c-20.27,20.241 -59.115,21.816 -70.534,21.816c-11.428,0 -50.277,-1.575 -70.522,-21.82c-3.007,-3.008 -3.007,-7.882 0,-10.889c3.003,-2.999 7.882,-3.003 10.885,0c12.777,12.781 40.11,17.317 59.637,17.317c19.522,0 46.86,-4.536 59.657,-17.321c3.016,-2.999 7.886,-2.995 10.885,0.008c3.008,3.011 3.003,7.882 -0.008,10.889Zm-5.23,-48.781c-16.373,0 -29.701,-13.324 -29.701,-29.698c0,-16.381 13.328,-29.714 29.701,-29.714c16.378,0 29.706,13.333 29.706,29.714c0,16.374 -13.328,29.698 -29.706,29.698Zm-160.386,-29.702c0,-16.381 13.328,-29.71 29.714,-29.71c16.369,0 29.689,13.329 29.689,29.71c0,16.373 -13.32,29.693 -29.689,29.693c-16.386,0 -29.714,-13.32 -29.714,-29.693Z" />
+        </svg>
+    </a>
+    <a target="_blank" rel="noopener noreferrer" aria-label="share Skill笔记：把经验写成可复用的Agent能力 on facebook"
+        href="https://facebook.com/sharer/sharer.php?u=https%3a%2f%2foyzg.github.io%2farchives%2fskill%25E7%25AC%2594%25E8%25AE%25B0%25E6%258A%258A%25E7%25BB%258F%25E9%25AA%258C%25E5%2586%2599%25E6%2588%2590%25E5%258F%25AF%25E5%25A4%258D%25E7%2594%25A8%25E7%259A%2584agent%25E8%2583%25BD%25E5%258A%259B%2f">
+        <svg version="1.1" viewBox="0 0 512 512" xml:space="preserve">
+            <path
+                d="M449.446,0c34.525,0 62.554,28.03 62.554,62.554l0,386.892c0,34.524 -28.03,62.554 -62.554,62.554l-106.468,0l0,-192.915l66.6,0l12.672,-82.621l-79.272,0l0,-53.617c0,-22.603 11.073,-44.636 46.58,-44.636l36.042,0l0,-70.34c0,0 -32.71,-5.582 -63.982,-5.582c-65.288,0 -107.96,39.569 -107.96,111.204l0,62.971l-72.573,0l0,82.621l72.573,0l0,192.915l-191.104,0c-34.524,0 -62.554,-28.03 -62.554,-62.554l0,-386.892c0,-34.524 28.029,-62.554 62.554,-62.554l386.892,0Z" />
+        </svg>
+    </a>
+    <a target="_blank" rel="noopener noreferrer" aria-label="share Skill笔记：把经验写成可复用的Agent能力 on whatsapp"
+        href="https://api.whatsapp.com/send?text=Skill%e7%ac%94%e8%ae%b0%ef%bc%9a%e6%8a%8a%e7%bb%8f%e9%aa%8c%e5%86%99%e6%88%90%e5%8f%af%e5%a4%8d%e7%94%a8%e7%9a%84Agent%e8%83%bd%e5%8a%9b%20-%20https%3a%2f%2foyzg.github.io%2farchives%2fskill%25E7%25AC%2594%25E8%25AE%25B0%25E6%258A%258A%25E7%25BB%258F%25E9%25AA%258C%25E5%2586%2599%25E6%2588%2590%25E5%258F%25AF%25E5%25A4%258D%25E7%2594%25A8%25E7%259A%2584agent%25E8%2583%25BD%25E5%258A%259B%2f">
+        <svg version="1.1" viewBox="0 0 512 512" xml:space="preserve">
+            <path
+                d="M449.446,0c34.525,0 62.554,28.03 62.554,62.554l0,386.892c0,34.524 -28.03,62.554 -62.554,62.554l-386.892,0c-34.524,0 -62.554,-28.03 -62.554,-62.554l0,-386.892c0,-34.524 28.029,-62.554 62.554,-62.554l386.892,0Zm-58.673,127.703c-33.842,-33.881 -78.847,-52.548 -126.798,-52.568c-98.799,0 -179.21,80.405 -179.249,179.234c-0.013,31.593 8.241,62.428 23.927,89.612l-25.429,92.884l95.021,-24.925c26.181,14.28 55.659,21.807 85.658,21.816l0.074,0c98.789,0 179.206,-80.413 179.247,-179.243c0.018,-47.895 -18.61,-92.93 -52.451,-126.81Zm-126.797,275.782l-0.06,0c-26.734,-0.01 -52.954,-7.193 -75.828,-20.767l-5.441,-3.229l-56.386,14.792l15.05,-54.977l-3.542,-5.637c-14.913,-23.72 -22.791,-51.136 -22.779,-79.287c0.033,-82.142 66.867,-148.971 149.046,-148.971c39.793,0.014 77.199,15.531 105.329,43.692c28.128,28.16 43.609,65.592 43.594,105.4c-0.034,82.149 -66.866,148.983 -148.983,148.984Zm81.721,-111.581c-4.479,-2.242 -26.499,-13.075 -30.604,-14.571c-4.105,-1.495 -7.091,-2.241 -10.077,2.241c-2.986,4.483 -11.569,14.572 -14.182,17.562c-2.612,2.988 -5.225,3.364 -9.703,1.12c-4.479,-2.241 -18.91,-6.97 -36.017,-22.23c-13.314,-11.876 -22.304,-26.542 -24.916,-31.026c-2.612,-4.484 -0.279,-6.908 1.963,-9.14c2.016,-2.007 4.48,-5.232 6.719,-7.847c2.24,-2.615 2.986,-4.484 4.479,-7.472c1.493,-2.99 0.747,-5.604 -0.374,-7.846c-1.119,-2.241 -10.077,-24.288 -13.809,-33.256c-3.635,-8.733 -7.327,-7.55 -10.077,-7.688c-2.609,-0.13 -5.598,-0.158 -8.583,-0.158c-2.986,0 -7.839,1.121 -11.944,5.604c-4.105,4.484 -15.675,15.32 -15.675,37.364c0,22.046 16.048,43.342 18.287,46.332c2.24,2.99 31.582,48.227 76.511,67.627c10.685,4.615 19.028,7.371 25.533,9.434c10.728,3.41 20.492,2.929 28.209,1.775c8.605,-1.285 26.499,-10.833 30.231,-21.295c3.732,-10.464 3.732,-19.431 2.612,-21.298c-1.119,-1.869 -4.105,-2.99 -8.583,-5.232Z" />
+        </svg>
+    </a>
+    <a target="_blank" rel="noopener noreferrer" aria-label="share Skill笔记：把经验写成可复用的Agent能力 on telegram"
+        href="https://telegram.me/share/url?text=Skill%e7%ac%94%e8%ae%b0%ef%bc%9a%e6%8a%8a%e7%bb%8f%e9%aa%8c%e5%86%99%e6%88%90%e5%8f%af%e5%a4%8d%e7%94%a8%e7%9a%84Agent%e8%83%bd%e5%8a%9b&amp;url=https%3a%2f%2foyzg.github.io%2farchives%2fskill%25E7%25AC%2594%25E8%25AE%25B0%25E6%258A%258A%25E7%25BB%258F%25E9%25AA%258C%25E5%2586%2599%25E6%2588%2590%25E5%258F%25AF%25E5%25A4%258D%25E7%2594%25A8%25E7%259A%2584agent%25E8%2583%25BD%25E5%258A%259B%2f">
+        <svg version="1.1" xml:space="preserve" viewBox="2 2 28 28">
+            <path
+                d="M26.49,29.86H5.5a3.37,3.37,0,0,1-2.47-1,3.35,3.35,0,0,1-1-2.47V5.48A3.36,3.36,0,0,1,3,3,3.37,3.37,0,0,1,5.5,2h21A3.38,3.38,0,0,1,29,3a3.36,3.36,0,0,1,1,2.46V26.37a3.35,3.35,0,0,1-1,2.47A3.38,3.38,0,0,1,26.49,29.86Zm-5.38-6.71a.79.79,0,0,0,.85-.66L24.73,9.24a.55.55,0,0,0-.18-.46.62.62,0,0,0-.41-.17q-.08,0-16.53,6.11a.59.59,0,0,0-.41.59.57.57,0,0,0,.43.52l4,1.24,1.61,4.83a.62.62,0,0,0,.63.43.56.56,0,0,0,.4-.17L16.54,20l4.09,3A.9.9,0,0,0,21.11,23.15ZM13.8,20.71l-1.21-4q8.72-5.55,8.78-5.55c.15,0,.23,0,.23.16a.18.18,0,0,1,0,.06s-2.51,2.3-7.52,6.8Z" />
+        </svg>
+    </a>
+</div>
+
+  </footer>
+</article>
+    </main><footer class="footer">
+    <span>&copy; 2026 <a href="https://oyzg.github.io/">oyzg&#39;s note</a></span>
+    <span>&middot;</span>
+    <span>Powered by <a href="https://gohugo.io/" rel="noopener noreferrer" target="_blank">Hugo</a></span>
+    <span>&middot;</span>
+    <span>Theme <a href="https://git.io/hugopapermod" rel="noopener" target="_blank">PaperMod</a></span>
+</footer>
+<a href="#top" aria-label="go to top" title="Go to Top (Alt + G)">
+    <button class="top-link" id="top-link" type="button" accesskey="g">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 12 6" fill="currentColor">
+            <path d="M12 6H0l6-6z" />
+        </svg>
+    </button>
+</a>
+
+
+
+<script defer src="/assets/js/highlight.min.2eadbb982468c11a433a3e291f01326f2ba43f065e256bf792dbd79640a92316.js" integrity="sha256-Lq27mCRowRpDOj4pHwEybyukPwZeJWv3ktvXlkCpIxY="
+    onload="hljs.initHighlightingOnLoad();"></script>
+<script>
+    window.onload = function () {
+        if (localStorage.getItem("menu-scroll-position")) {
+            document.getElementById('menu').scrollLeft = localStorage.getItem("menu-scroll-position");
+        }
+    }
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener("click", function (e) {
+            e.preventDefault();
+            var id = this.getAttribute("href").substr(1);
+            if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView({
+                    behavior: "smooth"
+                });
+            } else {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView();
+            }
+            if (id === "top") {
+                history.replaceState(null, null, " ");
+            } else {
+                history.pushState(null, null, `#${id}`);
+            }
+        });
+    });
+    var mybutton = document.getElementById("top-link");
+    window.onscroll = function () {
+        if (document.body.scrollTop > 800 || document.documentElement.scrollTop > 800) {
+            mybutton.style.visibility = "visible";
+            mybutton.style.opacity = "1";
+        } else {
+            mybutton.style.visibility = "hidden";
+            mybutton.style.opacity = "0";
+        }
+    };
+
+    function menu_on_scroll() {
+        localStorage.setItem("menu-scroll-position", document.getElementById('menu').scrollLeft);
+    }
+
+</script>
+<script>
+    document.getElementById("theme-toggle").addEventListener("click", () => {
+        if (document.body.className.includes("dark")) {
+            document.body.classList.remove('dark');
+            localStorage.setItem("pref-theme", 'light');
+        } else {
+            document.body.classList.add('dark');
+            localStorage.setItem("pref-theme", 'dark');
+        }
+    })
+
+</script>
+
+</body>
+
+</html>

@@ -1,0 +1,465 @@
+<!DOCTYPE html>
+<html lang="en" dir="auto">
+
+<head><meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<meta name="robots" content="index, follow">
+<title>LLM基础笔记：Transformer、预训练和对齐 | oyzg&#39;s note</title>
+
+<meta name="keywords" content="LLM, Transformer, 预训练, 对齐, RLHF" />
+<meta name="description" content="整理LLM的基本训练链路：Transformer、next token prediction、预训练、指令微调和对齐。">
+<meta name="author" content="">
+<link rel="canonical" href="https://oyzg.github.io/archives/llm%E5%9F%BA%E7%A1%80%E7%AC%94%E8%AE%B0transformer%E9%A2%84%E8%AE%AD%E7%BB%83%E5%92%8C%E5%AF%B9%E9%BD%90/" />
+<link href="/assets/css/stylesheet.min.d597aab94c71b49b163b6ac67c7958079589ea1a0b7300e8a0014e1d2023b95e.css" integrity="sha256-1ZequUxxtJsWO2rGfHlYB5WJ6hoLcwDooAFOHSAjuV4=" rel="preload stylesheet"
+    as="style">
+
+<link rel="icon" href="https://oyzg.github.io/favicon.ico">
+<link rel="icon" type="image/png" sizes="16x16" href="https://oyzg.github.io/favicon-16x16.png">
+<link rel="icon" type="image/png" sizes="32x32" href="https://oyzg.github.io/favicon-32x32.png">
+<link rel="apple-touch-icon" href="https://oyzg.github.io/apple-touch-icon.png">
+<link rel="mask-icon" href="https://oyzg.github.io/safari-pinned-tab.svg">
+<meta name="theme-color" content="#2e2e33">
+<meta name="msapplication-TileColor" content="#2e2e33">
+<meta name="generator" content="Hugo 0.147.4">
+<link rel="alternate" hreflang="en" href="https://oyzg.github.io/archives/llm%E5%9F%BA%E7%A1%80%E7%AC%94%E8%AE%B0transformer%E9%A2%84%E8%AE%AD%E7%BB%83%E5%92%8C%E5%AF%B9%E9%BD%90/" />
+
+
+
+<meta property="og:title" content="LLM基础笔记：Transformer、预训练和对齐" />
+<meta property="og:description" content="整理LLM的基本训练链路：Transformer、next token prediction、预训练、指令微调和对齐。" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://oyzg.github.io/archives/llm%E5%9F%BA%E7%A1%80%E7%AC%94%E8%AE%B0transformer%E9%A2%84%E8%AE%AD%E7%BB%83%E5%92%8C%E5%AF%B9%E9%BD%90/" />
+<meta property="article:published_time" content="2025-10-12T20:00:00+08:00" />
+<meta property="article:modified_time" content="2025-10-12T20:00:00+08:00" />
+
+<meta name="twitter:card" content="summary"/>
+<meta name="twitter:title" content="LLM基础笔记：Transformer、预训练和对齐"/>
+<meta name="twitter:description" content="整理LLM的基本训练链路：Transformer、next token prediction、预训练、指令微调和对齐。"/>
+
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position":  1 ,
+      "name": "LLM基础笔记：Transformer、预训练和对齐",
+      "item": "https://oyzg.github.io/archives/llm%E5%9F%BA%E7%A1%80%E7%AC%94%E8%AE%B0transformer%E9%A2%84%E8%AE%AD%E7%BB%83%E5%92%8C%E5%AF%B9%E9%BD%90/"
+    }
+  ]
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": "LLM基础笔记：Transformer、预训练和对齐",
+  "name": "LLM基础笔记：Transformer、预训练和对齐",
+  "description": "整理LLM的基本训练链路：Transformer、next token prediction、预训练、指令微调和对齐。",
+  "keywords": [
+    "LLM", "Transformer", "预训练", "对齐", "RLHF"
+  ],
+  "articleBody": "LLM基础笔记：Transformer、预训练和对齐 这段时间补 LLM 的基础，发现很多概念如果只看名字会很散：Transformer、预训练、指令微调、RLHF、DPO、上下文学习，好像每个都能单独讲很久。但如果从“一个语言模型怎么从文本预测器变成可用助手”这条线去看，结构会清楚很多。\n我先按自己的理解记一遍，不追求把所有细节都写全，重点是把主线搭起来。\nTransformer LLM 的底座基本还是 Transformer。Transformer 论文是 2017 年的 Attention Is All You Need，它最核心的变化是用 self-attention 替代传统 RNN 里按时间一步步传递状态的方式。\nSelf-attention 的直觉是：每个 token 在更新表示时，可以直接看序列里的其他 token，并根据相关性分配权重。比如一句话里某个代词到底指谁，某个动词和哪个主语相关，模型可以通过 attention 在上下文中建立联系。\nTransformer 里有几个关键部件：\nToken embedding：把离散 token 映射成向量。 Positional encoding / position embedding：补充顺序信息。 Multi-head attention：从多个子空间看 token 之间的关系。 Feed-forward network：对每个位置的表示做非线性变换。 Residual connection 和 layer normalization：让深层网络更容易训练。 现在看起来这些结构很普通，但它解决了两个问题：一是并行训练更容易，二是长距离依赖不再完全依靠循环状态传递。后面 GPT、LLaMA、Qwen、DeepSeek 这些模型，本质上都还在这套结构上不断扩展。\nNext token prediction LLM 预训练的目标很简单：给定前面的 token，预测下一个 token。\n形式上就是最大化：\nP(x_t | x_1, x_2, ..., x_{t-1}) 刚开始我会觉得这个目标太弱了。只是猜下一个词，为什么能学会翻译、写代码、推理、总结、规划？后来想明白一点：文本本身压缩了大量世界知识和任务过程。要把下一个 token 预测好，模型不得不学习语法、事实、风格、代码结构、推理模式，甚至人类在文本里留下的解决问题步骤。\n所以 next token prediction 表面上是语言建模，实际是在大规模文本上做一种压缩学习。模型不是显式地学一个数据库，也不是显式地学一个规则系统，而是把很多统计规律和模式压进参数里。\n这里也要注意边界。模型会学到很多模式，但它不等于可靠知识库。它生成的是概率上合理的续写，不一定是真实答案。这也是后面 RAG、工具调用和 Agent 系统要补的部分。\n预训练 预训练阶段主要解决“能力来源”的问题。模型在海量文本、代码、网页、书籍、论文等数据上训练，学语言、知识、代码和基本推理模式。\n预训练的几个关键词：\n数据规模：模型能力很大程度来自数据覆盖面。 参数规模：更大模型通常有更强表达能力，但训练和推理成本更高。 计算规模：训练 token 数、batch、学习率、并行策略都很关键。 数据质量：低质量数据会带来噪声、幻觉和偏见。 Scaling law 的意义在于，它让模型训练变得更像工程问题：给定计算预算，怎么分配参数量和训练 token，怎么估计能力提升。Chinchilla 之后，一个重要认识是模型不能只堆参数，还要保证足够训练 token。\n预训练出来的 base model 通常不是好用助手。它更像一个强大的文本续写器，能补全，也能模仿，但不一定听指令，不一定按人类偏好回答，也不一定知道什么时候拒绝。\n指令微调 指令微调，也就是 SFT，解决的是“模型是否听得懂任务格式”的问题。\n预训练模型看到的文本形式很多，但它未必自然知道用户说“帮我总结一下”时应该输出什么。SFT 会用人工构造或筛选的 instruction-response 数据继续训练模型，让它学会按照指令回答。\nSFT 的效果通常很直观：\n回答更像助手，而不是续写网页。 更容易遵循格式要求。 对问答、总结、翻译、代码解释这类任务更稳定。 对多轮对话有基本适配。 但是 SFT 也有边界。它学的是示范答案的分布，如果示范数据里没有覆盖复杂偏好，模型不一定知道哪种回答更好。比如同一个问题，答案 A 更有帮助，答案 B 更安全，答案 C 更简洁，SFT 很难直接表达这种偏好比较。\nRLHF RLHF 解决的是“偏好对齐”的问题。InstructGPT 是这条路线的代表工作。\n大致流程是：\n先做 SFT，让模型会按指令回答。 对同一个 prompt 采样多个回答，让人类标注哪个更好。 用偏好数据训练 reward model。 用强化学习优化语言模型，让它生成 reward 更高的回答。 RLHF 的目标不是让模型知道更多事实，而是让它更符合人类偏好：更有帮助、更少胡说、更安全、更符合对话习惯。\n这里我觉得最关键的点是：RLHF 把“好回答”从固定标签变成了偏好比较。很多自然语言任务没有唯一标准答案，用偏好学习会更自然。\n但 RLHF 也复杂。它需要 reward model，需要 PPO 这类训练过程，工程成本高，也可能出现 reward hacking。模型可能学会迎合 reward，而不是真正变可靠。\nDPO DPO 是 2023 年的工作，题目是 Direct Preference Optimization。它的思路是绕开显式 reward model 和 RL 过程，直接用偏好数据优化模型。\nDPO 的直觉是：如果对于同一个 prompt，人类更喜欢回答 y_w 而不是 y_l，那么模型应该提高 y_w 的概率，降低 y_l 的概率，同时不要偏离参考模型太多。\n相比 RLHF，DPO 的工程链路简单很多：\n不需要单独训练 reward model。 不需要跑复杂强化学习。 更像常规监督训练，稳定性更好。 所以现在很多模型对齐流程会使用 DPO 或类似偏好优化方法。它不是完全替代 RLHF 的所有情况，但让偏好对齐更容易工程化。\n上下文学习 In-context learning 是 LLM 很特别的能力。不给模型更新参数，只是在 prompt 里放几个例子，模型就能模仿任务形式完成新任务。\n这个能力来自预训练。训练时模型见过大量上下文模式，所以推理时能把 prompt 当作临时任务描述。\n比如：\n输入：苹果 输出：水果 输入：篮球 输出：运动器材 输入：钢琴 输出： 模型可以根据前两个例子推断第三个应该输出“乐器”。这不是参数更新，而是上下文里的模式归纳。\n上下文学习的价值很大，因为很多任务不需要微调，只要 prompt 设计得好就能跑。但它也有不稳定的问题：例子顺序、表述方式、上下文长度都会影响结果。\n能力和幻觉 LLM 的强大和不可靠来自同一个机制：它根据上下文生成高概率 token。\n当训练数据覆盖充分、任务模式清晰时，这个机制表现得像理解和推理。当问题需要精确事实、实时信息、外部状态或严格执行时，它就容易出问题。\n所以我不想把 LLM 单独看成完整系统。Base model、SFT、RLHF/DPO 只是把模型变成一个更会回答问题的核心组件。真正落到应用里，还需要：\nRAG 提供外部知识。 工具调用处理实时状态和计算。 Agent loop 处理多步任务。 Memory 保存跨会话经验。 权限系统限制危险操作。 LLM 是核心，但不是全部。\n记录 LLM 的主线可以先记成四层：\n第一层是 Transformer，提供可扩展的序列建模结构。\n第二层是预训练，用 next token prediction 从大规模文本中学通用模式。\n第三层是指令微调，让模型从续写器变成能听指令的助手。\n第四层是对齐，用 RLHF、DPO 等方法让回答更符合人类偏好。\n后面看 RAG、Agent、MCP、Skill 时，其实都是在补 LLM 的系统边界。模型本身负责语言和推理，外部系统负责知识、工具、记忆、权限和执行。\n参考 Attention Is All You Need Language Models are Few-Shot Learners Training language models to follow instructions with human feedback Direct Preference Optimization Training Compute-Optimal Large Language Models ",
+  "wordCount" : "277",
+  "inLanguage": "en",
+  "datePublished": "2025-10-12T20:00:00+08:00",
+  "dateModified": "2025-10-12T20:00:00+08:00",
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id": "https://oyzg.github.io/archives/llm%E5%9F%BA%E7%A1%80%E7%AC%94%E8%AE%B0transformer%E9%A2%84%E8%AE%AD%E7%BB%83%E5%92%8C%E5%AF%B9%E9%BD%90/"
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "oyzg's note",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "https://oyzg.github.io/favicon.ico"
+    }
+  }
+}
+</script>
+
+
+
+
+
+</head>
+
+<body class="" id="top">
+<script>
+    if (localStorage.getItem("pref-theme") === "dark") {
+        document.body.classList.add('dark');
+    } else if (localStorage.getItem("pref-theme") === "light") {
+        document.body.classList.remove('dark')
+    } else if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+        document.body.classList.add('dark');
+    }
+
+</script>
+<noscript>
+    <style type="text/css">
+        #theme-toggle,
+        .top-link {
+            display: none;
+        }
+
+    </style>
+</noscript>
+<header class="header">
+    <nav class="nav">
+        <div class="logo">
+            <a href="https://oyzg.github.io/" accesskey="h" title="oyzg&#39;s note (Alt + H)">oyzg&#39;s note</a>
+            <span class="logo-switches">
+                <button id="theme-toggle" accesskey="t" title="(Alt + T)">
+                    <svg id="moon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                    </svg>
+                    <svg id="sun" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="5"></circle>
+                        <line x1="12" y1="1" x2="12" y2="3"></line>
+                        <line x1="12" y1="21" x2="12" y2="23"></line>
+                        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                        <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                        <line x1="1" y1="12" x2="3" y2="12"></line>
+                        <line x1="21" y1="12" x2="23" y2="12"></line>
+                        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                        <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+                    </svg>
+                </button>
+                
+                
+
+                <ul class="lang-switch"><li>|</li>
+                </ul>
+            </span>
+        </div>
+        <ul id="menu" onscroll="menu_on_scroll()">
+            <li>
+                <a href="https://oyzg.github.io/archives/" title="Archive">
+                    <span>Archive</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://oyzg.github.io/categories/" title="Categories">
+                    <span>Categories</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://oyzg.github.io/series/" title="Series">
+                    <span>Series</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://oyzg.github.io/tags/" title="Tags">
+                    <span>Tags</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://oyzg.github.io/search/" title="Search (Alt &#43; /)" accesskey=/>
+                    <span>Search</span>
+                </a>
+            </li></ul>
+    </nav>
+</header>
+
+    <main class="main">
+
+<article class="post-single">
+  <header class="post-header">
+
+    <h1 class="post-title">
+      LLM基础笔记：Transformer、预训练和对齐
+    </h1>
+    <div class="post-meta">October 12, 2025 · 2 min
+
+</div>
+  </header> 
+
+  <div class="toc">
+    <details >
+      <summary accesskey="c" title="(Alt + C)">
+        <div class="details">Table of Contents</div>
+      </summary>
+      <div class="inner"><ul><li>
+        <a href="#llm%e5%9f%ba%e7%a1%80%e7%ac%94%e8%ae%b0transformer%e9%a2%84%e8%ae%ad%e7%bb%83%e5%92%8c%e5%af%b9%e9%bd%90" aria-label="LLM基础笔记：Transformer、预训练和对齐">LLM基础笔记：Transformer、预训练和对齐</a><ul>
+            <li>
+        <a href="#transformer" aria-label="Transformer">Transformer</a></li><li>
+        <a href="#next-token-prediction" aria-label="Next token prediction">Next token prediction</a></li><li>
+        <a href="#%e9%a2%84%e8%ae%ad%e7%bb%83" aria-label="预训练">预训练</a></li><li>
+        <a href="#%e6%8c%87%e4%bb%a4%e5%be%ae%e8%b0%83" aria-label="指令微调">指令微调</a></li><li>
+        <a href="#rlhf" aria-label="RLHF">RLHF</a></li><li>
+        <a href="#dpo" aria-label="DPO">DPO</a></li><li>
+        <a href="#%e4%b8%8a%e4%b8%8b%e6%96%87%e5%ad%a6%e4%b9%a0" aria-label="上下文学习">上下文学习</a></li><li>
+        <a href="#%e8%83%bd%e5%8a%9b%e5%92%8c%e5%b9%bb%e8%a7%89" aria-label="能力和幻觉">能力和幻觉</a></li><li>
+        <a href="#%e8%ae%b0%e5%bd%95" aria-label="记录">记录</a></li><li>
+        <a href="#%e5%8f%82%e8%80%83" aria-label="参考">参考</a></li></ul>
+</li></ul>
+      </div>
+    </details>
+  </div>
+  <div class="post-content">
+    
+<h1 id="llm基础笔记transformer预训练和对齐">LLM基础笔记：Transformer、预训练和对齐<a hidden class="anchor" aria-hidden="true" href="#llm基础笔记transformer预训练和对齐">#</a></h1>
+<p>这段时间补 LLM 的基础，发现很多概念如果只看名字会很散：Transformer、预训练、指令微调、RLHF、DPO、上下文学习，好像每个都能单独讲很久。但如果从“一个语言模型怎么从文本预测器变成可用助手”这条线去看，结构会清楚很多。</p>
+<p>我先按自己的理解记一遍，不追求把所有细节都写全，重点是把主线搭起来。</p>
+<h2 id="transformer">Transformer<a hidden class="anchor" aria-hidden="true" href="#transformer">#</a></h2>
+<p>LLM 的底座基本还是 Transformer。Transformer 论文是 2017 年的 <em>Attention Is All You Need</em>，它最核心的变化是用 self-attention 替代传统 RNN 里按时间一步步传递状态的方式。</p>
+<p>Self-attention 的直觉是：每个 token 在更新表示时，可以直接看序列里的其他 token，并根据相关性分配权重。比如一句话里某个代词到底指谁，某个动词和哪个主语相关，模型可以通过 attention 在上下文中建立联系。</p>
+<p>Transformer 里有几个关键部件：</p>
+<ul>
+<li>Token embedding：把离散 token 映射成向量。</li>
+<li>Positional encoding / position embedding：补充顺序信息。</li>
+<li>Multi-head attention：从多个子空间看 token 之间的关系。</li>
+<li>Feed-forward network：对每个位置的表示做非线性变换。</li>
+<li>Residual connection 和 layer normalization：让深层网络更容易训练。</li>
+</ul>
+<p>现在看起来这些结构很普通，但它解决了两个问题：一是并行训练更容易，二是长距离依赖不再完全依靠循环状态传递。后面 GPT、LLaMA、Qwen、DeepSeek 这些模型，本质上都还在这套结构上不断扩展。</p>
+<h2 id="next-token-prediction">Next token prediction<a hidden class="anchor" aria-hidden="true" href="#next-token-prediction">#</a></h2>
+<p>LLM 预训练的目标很简单：给定前面的 token，预测下一个 token。</p>
+<p>形式上就是最大化：</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-text" data-lang="text"><span style="display:flex;"><span>P(x_t | x_1, x_2, ..., x_{t-1})
+</span></span></code></pre></div><p>刚开始我会觉得这个目标太弱了。只是猜下一个词，为什么能学会翻译、写代码、推理、总结、规划？后来想明白一点：文本本身压缩了大量世界知识和任务过程。要把下一个 token 预测好，模型不得不学习语法、事实、风格、代码结构、推理模式，甚至人类在文本里留下的解决问题步骤。</p>
+<p>所以 next token prediction 表面上是语言建模，实际是在大规模文本上做一种压缩学习。模型不是显式地学一个数据库，也不是显式地学一个规则系统，而是把很多统计规律和模式压进参数里。</p>
+<p>这里也要注意边界。模型会学到很多模式，但它不等于可靠知识库。它生成的是概率上合理的续写，不一定是真实答案。这也是后面 RAG、工具调用和 Agent 系统要补的部分。</p>
+<h2 id="预训练">预训练<a hidden class="anchor" aria-hidden="true" href="#预训练">#</a></h2>
+<p>预训练阶段主要解决“能力来源”的问题。模型在海量文本、代码、网页、书籍、论文等数据上训练，学语言、知识、代码和基本推理模式。</p>
+<p>预训练的几个关键词：</p>
+<ul>
+<li>数据规模：模型能力很大程度来自数据覆盖面。</li>
+<li>参数规模：更大模型通常有更强表达能力，但训练和推理成本更高。</li>
+<li>计算规模：训练 token 数、batch、学习率、并行策略都很关键。</li>
+<li>数据质量：低质量数据会带来噪声、幻觉和偏见。</li>
+</ul>
+<p>Scaling law 的意义在于，它让模型训练变得更像工程问题：给定计算预算，怎么分配参数量和训练 token，怎么估计能力提升。Chinchilla 之后，一个重要认识是模型不能只堆参数，还要保证足够训练 token。</p>
+<p>预训练出来的 base model 通常不是好用助手。它更像一个强大的文本续写器，能补全，也能模仿，但不一定听指令，不一定按人类偏好回答，也不一定知道什么时候拒绝。</p>
+<h2 id="指令微调">指令微调<a hidden class="anchor" aria-hidden="true" href="#指令微调">#</a></h2>
+<p>指令微调，也就是 SFT，解决的是“模型是否听得懂任务格式”的问题。</p>
+<p>预训练模型看到的文本形式很多，但它未必自然知道用户说“帮我总结一下”时应该输出什么。SFT 会用人工构造或筛选的 instruction-response 数据继续训练模型，让它学会按照指令回答。</p>
+<p>SFT 的效果通常很直观：</p>
+<ul>
+<li>回答更像助手，而不是续写网页。</li>
+<li>更容易遵循格式要求。</li>
+<li>对问答、总结、翻译、代码解释这类任务更稳定。</li>
+<li>对多轮对话有基本适配。</li>
+</ul>
+<p>但是 SFT 也有边界。它学的是示范答案的分布，如果示范数据里没有覆盖复杂偏好，模型不一定知道哪种回答更好。比如同一个问题，答案 A 更有帮助，答案 B 更安全，答案 C 更简洁，SFT 很难直接表达这种偏好比较。</p>
+<h2 id="rlhf">RLHF<a hidden class="anchor" aria-hidden="true" href="#rlhf">#</a></h2>
+<p>RLHF 解决的是“偏好对齐”的问题。InstructGPT 是这条路线的代表工作。</p>
+<p>大致流程是：</p>
+<ol>
+<li>先做 SFT，让模型会按指令回答。</li>
+<li>对同一个 prompt 采样多个回答，让人类标注哪个更好。</li>
+<li>用偏好数据训练 reward model。</li>
+<li>用强化学习优化语言模型，让它生成 reward 更高的回答。</li>
+</ol>
+<p>RLHF 的目标不是让模型知道更多事实，而是让它更符合人类偏好：更有帮助、更少胡说、更安全、更符合对话习惯。</p>
+<p>这里我觉得最关键的点是：RLHF 把“好回答”从固定标签变成了偏好比较。很多自然语言任务没有唯一标准答案，用偏好学习会更自然。</p>
+<p>但 RLHF 也复杂。它需要 reward model，需要 PPO 这类训练过程，工程成本高，也可能出现 reward hacking。模型可能学会迎合 reward，而不是真正变可靠。</p>
+<h2 id="dpo">DPO<a hidden class="anchor" aria-hidden="true" href="#dpo">#</a></h2>
+<p>DPO 是 2023 年的工作，题目是 <em>Direct Preference Optimization</em>。它的思路是绕开显式 reward model 和 RL 过程，直接用偏好数据优化模型。</p>
+<p>DPO 的直觉是：如果对于同一个 prompt，人类更喜欢回答 y_w 而不是 y_l，那么模型应该提高 y_w 的概率，降低 y_l 的概率，同时不要偏离参考模型太多。</p>
+<p>相比 RLHF，DPO 的工程链路简单很多：</p>
+<ul>
+<li>不需要单独训练 reward model。</li>
+<li>不需要跑复杂强化学习。</li>
+<li>更像常规监督训练，稳定性更好。</li>
+</ul>
+<p>所以现在很多模型对齐流程会使用 DPO 或类似偏好优化方法。它不是完全替代 RLHF 的所有情况，但让偏好对齐更容易工程化。</p>
+<h2 id="上下文学习">上下文学习<a hidden class="anchor" aria-hidden="true" href="#上下文学习">#</a></h2>
+<p>In-context learning 是 LLM 很特别的能力。不给模型更新参数，只是在 prompt 里放几个例子，模型就能模仿任务形式完成新任务。</p>
+<p>这个能力来自预训练。训练时模型见过大量上下文模式，所以推理时能把 prompt 当作临时任务描述。</p>
+<p>比如：</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-text" data-lang="text"><span style="display:flex;"><span>输入：苹果
+</span></span><span style="display:flex;"><span>输出：水果
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>输入：篮球
+</span></span><span style="display:flex;"><span>输出：运动器材
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>输入：钢琴
+</span></span><span style="display:flex;"><span>输出：
+</span></span></code></pre></div><p>模型可以根据前两个例子推断第三个应该输出“乐器”。这不是参数更新，而是上下文里的模式归纳。</p>
+<p>上下文学习的价值很大，因为很多任务不需要微调，只要 prompt 设计得好就能跑。但它也有不稳定的问题：例子顺序、表述方式、上下文长度都会影响结果。</p>
+<h2 id="能力和幻觉">能力和幻觉<a hidden class="anchor" aria-hidden="true" href="#能力和幻觉">#</a></h2>
+<p>LLM 的强大和不可靠来自同一个机制：它根据上下文生成高概率 token。</p>
+<p>当训练数据覆盖充分、任务模式清晰时，这个机制表现得像理解和推理。当问题需要精确事实、实时信息、外部状态或严格执行时，它就容易出问题。</p>
+<p>所以我不想把 LLM 单独看成完整系统。Base model、SFT、RLHF/DPO 只是把模型变成一个更会回答问题的核心组件。真正落到应用里，还需要：</p>
+<ul>
+<li>RAG 提供外部知识。</li>
+<li>工具调用处理实时状态和计算。</li>
+<li>Agent loop 处理多步任务。</li>
+<li>Memory 保存跨会话经验。</li>
+<li>权限系统限制危险操作。</li>
+</ul>
+<p>LLM 是核心，但不是全部。</p>
+<h2 id="记录">记录<a hidden class="anchor" aria-hidden="true" href="#记录">#</a></h2>
+<p>LLM 的主线可以先记成四层：</p>
+<p>第一层是 Transformer，提供可扩展的序列建模结构。</p>
+<p>第二层是预训练，用 next token prediction 从大规模文本中学通用模式。</p>
+<p>第三层是指令微调，让模型从续写器变成能听指令的助手。</p>
+<p>第四层是对齐，用 RLHF、DPO 等方法让回答更符合人类偏好。</p>
+<p>后面看 RAG、Agent、MCP、Skill 时，其实都是在补 LLM 的系统边界。模型本身负责语言和推理，外部系统负责知识、工具、记忆、权限和执行。</p>
+<h2 id="参考">参考<a hidden class="anchor" aria-hidden="true" href="#参考">#</a></h2>
+<ul>
+<li><a href="https://arxiv.org/abs/1706.03762">Attention Is All You Need</a></li>
+<li><a href="https://arxiv.org/abs/2005.14165">Language Models are Few-Shot Learners</a></li>
+<li><a href="https://arxiv.org/abs/2203.02155">Training language models to follow instructions with human feedback</a></li>
+<li><a href="https://arxiv.org/abs/2305.18290">Direct Preference Optimization</a></li>
+<li><a href="https://arxiv.org/abs/2203.15556">Training Compute-Optimal Large Language Models</a></li>
+</ul>
+
+</div>
+  <footer class="post-footer">
+    <ul class="post-tags">
+      <li><a href="https://oyzg.github.io/tags/llm/">LLM</a></li>
+      <li><a href="https://oyzg.github.io/tags/transformer/">Transformer</a></li>
+      <li><a href="https://oyzg.github.io/tags/%E9%A2%84%E8%AE%AD%E7%BB%83/">预训练</a></li>
+      <li><a href="https://oyzg.github.io/tags/%E5%AF%B9%E9%BD%90/">对齐</a></li>
+      <li><a href="https://oyzg.github.io/tags/rlhf/">RLHF</a></li>
+    </ul>
+    <nav class="paginav">
+      <a class="prev" href="https://oyzg.github.io/archives/kubernetes/">
+        <span class="title">« Prev Page</span>
+        <br>
+        <span>Kubernetes</span>
+      </a>
+      <a class="next" href="https://oyzg.github.io/archives/%E8%AE%A4%E7%9F%A5%E8%A7%89%E9%86%92/">
+        <span class="title">Next Page »</span>
+        <br>
+        <span>《认知觉醒》</span>
+      </a>
+    </nav>
+
+
+
+
+
+
+<div class="share-buttons">
+    <a target="_blank" rel="noopener noreferrer" aria-label="share LLM基础笔记：Transformer、预训练和对齐 on twitter"
+        href="https://twitter.com/intent/tweet/?text=LLM%e5%9f%ba%e7%a1%80%e7%ac%94%e8%ae%b0%ef%bc%9aTransformer%e3%80%81%e9%a2%84%e8%ae%ad%e7%bb%83%e5%92%8c%e5%af%b9%e9%bd%90&amp;url=https%3a%2f%2foyzg.github.io%2farchives%2fllm%25E5%259F%25BA%25E7%25A1%2580%25E7%25AC%2594%25E8%25AE%25B0transformer%25E9%25A2%2584%25E8%25AE%25AD%25E7%25BB%2583%25E5%2592%258C%25E5%25AF%25B9%25E9%25BD%2590%2f&amp;hashtags=LLM%2cTransformer%2c%e9%a2%84%e8%ae%ad%e7%bb%83%2c%e5%af%b9%e9%bd%90%2cRLHF">
+        <svg version="1.1" viewBox="0 0 512 512" xml:space="preserve">
+            <path
+                d="M449.446,0c34.525,0 62.554,28.03 62.554,62.554l0,386.892c0,34.524 -28.03,62.554 -62.554,62.554l-386.892,0c-34.524,0 -62.554,-28.03 -62.554,-62.554l0,-386.892c0,-34.524 28.029,-62.554 62.554,-62.554l386.892,0Zm-253.927,424.544c135.939,0 210.268,-112.643 210.268,-210.268c0,-3.218 0,-6.437 -0.153,-9.502c14.406,-10.421 26.973,-23.448 36.935,-38.314c-13.18,5.824 -27.433,9.809 -42.452,11.648c15.326,-9.196 26.973,-23.602 32.49,-40.92c-14.252,8.429 -30.038,14.56 -46.896,17.931c-13.487,-14.406 -32.644,-23.295 -53.946,-23.295c-40.767,0 -73.87,33.104 -73.87,73.87c0,5.824 0.613,11.494 1.992,16.858c-61.456,-3.065 -115.862,-32.49 -152.337,-77.241c-6.284,10.881 -9.962,23.601 -9.962,37.088c0,25.594 13.027,48.276 32.95,61.456c-12.107,-0.307 -23.448,-3.678 -33.41,-9.196l0,0.92c0,35.862 25.441,65.594 59.311,72.49c-6.13,1.686 -12.72,2.606 -19.464,2.606c-4.751,0 -9.348,-0.46 -13.946,-1.38c9.349,29.426 36.628,50.728 68.965,51.341c-25.287,19.771 -57.164,31.571 -91.8,31.571c-5.977,0 -11.801,-0.306 -17.625,-1.073c32.337,21.15 71.264,33.41 112.95,33.41Z" />
+        </svg>
+    </a>
+    <a target="_blank" rel="noopener noreferrer" aria-label="share LLM基础笔记：Transformer、预训练和对齐 on linkedin"
+        href="https://www.linkedin.com/shareArticle?mini=true&amp;url=https%3a%2f%2foyzg.github.io%2farchives%2fllm%25E5%259F%25BA%25E7%25A1%2580%25E7%25AC%2594%25E8%25AE%25B0transformer%25E9%25A2%2584%25E8%25AE%25AD%25E7%25BB%2583%25E5%2592%258C%25E5%25AF%25B9%25E9%25BD%2590%2f&amp;title=LLM%e5%9f%ba%e7%a1%80%e7%ac%94%e8%ae%b0%ef%bc%9aTransformer%e3%80%81%e9%a2%84%e8%ae%ad%e7%bb%83%e5%92%8c%e5%af%b9%e9%bd%90&amp;summary=LLM%e5%9f%ba%e7%a1%80%e7%ac%94%e8%ae%b0%ef%bc%9aTransformer%e3%80%81%e9%a2%84%e8%ae%ad%e7%bb%83%e5%92%8c%e5%af%b9%e9%bd%90&amp;source=https%3a%2f%2foyzg.github.io%2farchives%2fllm%25E5%259F%25BA%25E7%25A1%2580%25E7%25AC%2594%25E8%25AE%25B0transformer%25E9%25A2%2584%25E8%25AE%25AD%25E7%25BB%2583%25E5%2592%258C%25E5%25AF%25B9%25E9%25BD%2590%2f">
+        <svg version="1.1" viewBox="0 0 512 512" xml:space="preserve">
+            <path
+                d="M449.446,0c34.525,0 62.554,28.03 62.554,62.554l0,386.892c0,34.524 -28.03,62.554 -62.554,62.554l-386.892,0c-34.524,0 -62.554,-28.03 -62.554,-62.554l0,-386.892c0,-34.524 28.029,-62.554 62.554,-62.554l386.892,0Zm-288.985,423.278l0,-225.717l-75.04,0l0,225.717l75.04,0Zm270.539,0l0,-129.439c0,-69.333 -37.018,-101.586 -86.381,-101.586c-39.804,0 -57.634,21.891 -67.617,37.266l0,-31.958l-75.021,0c0.995,21.181 0,225.717 0,225.717l75.02,0l0,-126.056c0,-6.748 0.486,-13.492 2.474,-18.315c5.414,-13.475 17.767,-27.434 38.494,-27.434c27.135,0 38.007,20.707 38.007,51.037l0,120.768l75.024,0Zm-307.552,-334.556c-25.674,0 -42.448,16.879 -42.448,39.002c0,21.658 16.264,39.002 41.455,39.002l0.484,0c26.165,0 42.452,-17.344 42.452,-39.002c-0.485,-22.092 -16.241,-38.954 -41.943,-39.002Z" />
+        </svg>
+    </a>
+    <a target="_blank" rel="noopener noreferrer" aria-label="share LLM基础笔记：Transformer、预训练和对齐 on reddit"
+        href="https://reddit.com/submit?url=https%3a%2f%2foyzg.github.io%2farchives%2fllm%25E5%259F%25BA%25E7%25A1%2580%25E7%25AC%2594%25E8%25AE%25B0transformer%25E9%25A2%2584%25E8%25AE%25AD%25E7%25BB%2583%25E5%2592%258C%25E5%25AF%25B9%25E9%25BD%2590%2f&title=LLM%e5%9f%ba%e7%a1%80%e7%ac%94%e8%ae%b0%ef%bc%9aTransformer%e3%80%81%e9%a2%84%e8%ae%ad%e7%bb%83%e5%92%8c%e5%af%b9%e9%bd%90">
+        <svg version="1.1" viewBox="0 0 512 512" xml:space="preserve">
+            <path
+                d="M449.446,0c34.525,0 62.554,28.03 62.554,62.554l0,386.892c0,34.524 -28.03,62.554 -62.554,62.554l-386.892,0c-34.524,0 -62.554,-28.03 -62.554,-62.554l0,-386.892c0,-34.524 28.029,-62.554 62.554,-62.554l386.892,0Zm-3.446,265.638c0,-22.964 -18.616,-41.58 -41.58,-41.58c-11.211,0 -21.361,4.457 -28.841,11.666c-28.424,-20.508 -67.586,-33.757 -111.204,-35.278l18.941,-89.121l61.884,13.157c0.756,15.734 13.642,28.29 29.56,28.29c16.407,0 29.706,-13.299 29.706,-29.701c0,-16.403 -13.299,-29.702 -29.706,-29.702c-11.666,0 -21.657,6.792 -26.515,16.578l-69.105,-14.69c-1.922,-0.418 -3.939,-0.042 -5.585,1.036c-1.658,1.073 -2.811,2.761 -3.224,4.686l-21.152,99.438c-44.258,1.228 -84.046,14.494 -112.837,35.232c-7.468,-7.164 -17.589,-11.591 -28.757,-11.591c-22.965,0 -41.585,18.616 -41.585,41.58c0,16.896 10.095,31.41 24.568,37.918c-0.639,4.135 -0.99,8.328 -0.99,12.576c0,63.977 74.469,115.836 166.33,115.836c91.861,0 166.334,-51.859 166.334,-115.836c0,-4.218 -0.347,-8.387 -0.977,-12.493c14.564,-6.47 24.735,-21.034 24.735,-38.001Zm-119.474,108.193c-20.27,20.241 -59.115,21.816 -70.534,21.816c-11.428,0 -50.277,-1.575 -70.522,-21.82c-3.007,-3.008 -3.007,-7.882 0,-10.889c3.003,-2.999 7.882,-3.003 10.885,0c12.777,12.781 40.11,17.317 59.637,17.317c19.522,0 46.86,-4.536 59.657,-17.321c3.016,-2.999 7.886,-2.995 10.885,0.008c3.008,3.011 3.003,7.882 -0.008,10.889Zm-5.23,-48.781c-16.373,0 -29.701,-13.324 -29.701,-29.698c0,-16.381 13.328,-29.714 29.701,-29.714c16.378,0 29.706,13.333 29.706,29.714c0,16.374 -13.328,29.698 -29.706,29.698Zm-160.386,-29.702c0,-16.381 13.328,-29.71 29.714,-29.71c16.369,0 29.689,13.329 29.689,29.71c0,16.373 -13.32,29.693 -29.689,29.693c-16.386,0 -29.714,-13.32 -29.714,-29.693Z" />
+        </svg>
+    </a>
+    <a target="_blank" rel="noopener noreferrer" aria-label="share LLM基础笔记：Transformer、预训练和对齐 on facebook"
+        href="https://facebook.com/sharer/sharer.php?u=https%3a%2f%2foyzg.github.io%2farchives%2fllm%25E5%259F%25BA%25E7%25A1%2580%25E7%25AC%2594%25E8%25AE%25B0transformer%25E9%25A2%2584%25E8%25AE%25AD%25E7%25BB%2583%25E5%2592%258C%25E5%25AF%25B9%25E9%25BD%2590%2f">
+        <svg version="1.1" viewBox="0 0 512 512" xml:space="preserve">
+            <path
+                d="M449.446,0c34.525,0 62.554,28.03 62.554,62.554l0,386.892c0,34.524 -28.03,62.554 -62.554,62.554l-106.468,0l0,-192.915l66.6,0l12.672,-82.621l-79.272,0l0,-53.617c0,-22.603 11.073,-44.636 46.58,-44.636l36.042,0l0,-70.34c0,0 -32.71,-5.582 -63.982,-5.582c-65.288,0 -107.96,39.569 -107.96,111.204l0,62.971l-72.573,0l0,82.621l72.573,0l0,192.915l-191.104,0c-34.524,0 -62.554,-28.03 -62.554,-62.554l0,-386.892c0,-34.524 28.029,-62.554 62.554,-62.554l386.892,0Z" />
+        </svg>
+    </a>
+    <a target="_blank" rel="noopener noreferrer" aria-label="share LLM基础笔记：Transformer、预训练和对齐 on whatsapp"
+        href="https://api.whatsapp.com/send?text=LLM%e5%9f%ba%e7%a1%80%e7%ac%94%e8%ae%b0%ef%bc%9aTransformer%e3%80%81%e9%a2%84%e8%ae%ad%e7%bb%83%e5%92%8c%e5%af%b9%e9%bd%90%20-%20https%3a%2f%2foyzg.github.io%2farchives%2fllm%25E5%259F%25BA%25E7%25A1%2580%25E7%25AC%2594%25E8%25AE%25B0transformer%25E9%25A2%2584%25E8%25AE%25AD%25E7%25BB%2583%25E5%2592%258C%25E5%25AF%25B9%25E9%25BD%2590%2f">
+        <svg version="1.1" viewBox="0 0 512 512" xml:space="preserve">
+            <path
+                d="M449.446,0c34.525,0 62.554,28.03 62.554,62.554l0,386.892c0,34.524 -28.03,62.554 -62.554,62.554l-386.892,0c-34.524,0 -62.554,-28.03 -62.554,-62.554l0,-386.892c0,-34.524 28.029,-62.554 62.554,-62.554l386.892,0Zm-58.673,127.703c-33.842,-33.881 -78.847,-52.548 -126.798,-52.568c-98.799,0 -179.21,80.405 -179.249,179.234c-0.013,31.593 8.241,62.428 23.927,89.612l-25.429,92.884l95.021,-24.925c26.181,14.28 55.659,21.807 85.658,21.816l0.074,0c98.789,0 179.206,-80.413 179.247,-179.243c0.018,-47.895 -18.61,-92.93 -52.451,-126.81Zm-126.797,275.782l-0.06,0c-26.734,-0.01 -52.954,-7.193 -75.828,-20.767l-5.441,-3.229l-56.386,14.792l15.05,-54.977l-3.542,-5.637c-14.913,-23.72 -22.791,-51.136 -22.779,-79.287c0.033,-82.142 66.867,-148.971 149.046,-148.971c39.793,0.014 77.199,15.531 105.329,43.692c28.128,28.16 43.609,65.592 43.594,105.4c-0.034,82.149 -66.866,148.983 -148.983,148.984Zm81.721,-111.581c-4.479,-2.242 -26.499,-13.075 -30.604,-14.571c-4.105,-1.495 -7.091,-2.241 -10.077,2.241c-2.986,4.483 -11.569,14.572 -14.182,17.562c-2.612,2.988 -5.225,3.364 -9.703,1.12c-4.479,-2.241 -18.91,-6.97 -36.017,-22.23c-13.314,-11.876 -22.304,-26.542 -24.916,-31.026c-2.612,-4.484 -0.279,-6.908 1.963,-9.14c2.016,-2.007 4.48,-5.232 6.719,-7.847c2.24,-2.615 2.986,-4.484 4.479,-7.472c1.493,-2.99 0.747,-5.604 -0.374,-7.846c-1.119,-2.241 -10.077,-24.288 -13.809,-33.256c-3.635,-8.733 -7.327,-7.55 -10.077,-7.688c-2.609,-0.13 -5.598,-0.158 -8.583,-0.158c-2.986,0 -7.839,1.121 -11.944,5.604c-4.105,4.484 -15.675,15.32 -15.675,37.364c0,22.046 16.048,43.342 18.287,46.332c2.24,2.99 31.582,48.227 76.511,67.627c10.685,4.615 19.028,7.371 25.533,9.434c10.728,3.41 20.492,2.929 28.209,1.775c8.605,-1.285 26.499,-10.833 30.231,-21.295c3.732,-10.464 3.732,-19.431 2.612,-21.298c-1.119,-1.869 -4.105,-2.99 -8.583,-5.232Z" />
+        </svg>
+    </a>
+    <a target="_blank" rel="noopener noreferrer" aria-label="share LLM基础笔记：Transformer、预训练和对齐 on telegram"
+        href="https://telegram.me/share/url?text=LLM%e5%9f%ba%e7%a1%80%e7%ac%94%e8%ae%b0%ef%bc%9aTransformer%e3%80%81%e9%a2%84%e8%ae%ad%e7%bb%83%e5%92%8c%e5%af%b9%e9%bd%90&amp;url=https%3a%2f%2foyzg.github.io%2farchives%2fllm%25E5%259F%25BA%25E7%25A1%2580%25E7%25AC%2594%25E8%25AE%25B0transformer%25E9%25A2%2584%25E8%25AE%25AD%25E7%25BB%2583%25E5%2592%258C%25E5%25AF%25B9%25E9%25BD%2590%2f">
+        <svg version="1.1" xml:space="preserve" viewBox="2 2 28 28">
+            <path
+                d="M26.49,29.86H5.5a3.37,3.37,0,0,1-2.47-1,3.35,3.35,0,0,1-1-2.47V5.48A3.36,3.36,0,0,1,3,3,3.37,3.37,0,0,1,5.5,2h21A3.38,3.38,0,0,1,29,3a3.36,3.36,0,0,1,1,2.46V26.37a3.35,3.35,0,0,1-1,2.47A3.38,3.38,0,0,1,26.49,29.86Zm-5.38-6.71a.79.79,0,0,0,.85-.66L24.73,9.24a.55.55,0,0,0-.18-.46.62.62,0,0,0-.41-.17q-.08,0-16.53,6.11a.59.59,0,0,0-.41.59.57.57,0,0,0,.43.52l4,1.24,1.61,4.83a.62.62,0,0,0,.63.43.56.56,0,0,0,.4-.17L16.54,20l4.09,3A.9.9,0,0,0,21.11,23.15ZM13.8,20.71l-1.21-4q8.72-5.55,8.78-5.55c.15,0,.23,0,.23.16a.18.18,0,0,1,0,.06s-2.51,2.3-7.52,6.8Z" />
+        </svg>
+    </a>
+</div>
+
+  </footer>
+</article>
+    </main><footer class="footer">
+    <span>&copy; 2026 <a href="https://oyzg.github.io/">oyzg&#39;s note</a></span>
+    <span>&middot;</span>
+    <span>Powered by <a href="https://gohugo.io/" rel="noopener noreferrer" target="_blank">Hugo</a></span>
+    <span>&middot;</span>
+    <span>Theme <a href="https://git.io/hugopapermod" rel="noopener" target="_blank">PaperMod</a></span>
+</footer>
+<a href="#top" aria-label="go to top" title="Go to Top (Alt + G)">
+    <button class="top-link" id="top-link" type="button" accesskey="g">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 12 6" fill="currentColor">
+            <path d="M12 6H0l6-6z" />
+        </svg>
+    </button>
+</a>
+
+
+
+<script defer src="/assets/js/highlight.min.2eadbb982468c11a433a3e291f01326f2ba43f065e256bf792dbd79640a92316.js" integrity="sha256-Lq27mCRowRpDOj4pHwEybyukPwZeJWv3ktvXlkCpIxY="
+    onload="hljs.initHighlightingOnLoad();"></script>
+<script>
+    window.onload = function () {
+        if (localStorage.getItem("menu-scroll-position")) {
+            document.getElementById('menu').scrollLeft = localStorage.getItem("menu-scroll-position");
+        }
+    }
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener("click", function (e) {
+            e.preventDefault();
+            var id = this.getAttribute("href").substr(1);
+            if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView({
+                    behavior: "smooth"
+                });
+            } else {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView();
+            }
+            if (id === "top") {
+                history.replaceState(null, null, " ");
+            } else {
+                history.pushState(null, null, `#${id}`);
+            }
+        });
+    });
+    var mybutton = document.getElementById("top-link");
+    window.onscroll = function () {
+        if (document.body.scrollTop > 800 || document.documentElement.scrollTop > 800) {
+            mybutton.style.visibility = "visible";
+            mybutton.style.opacity = "1";
+        } else {
+            mybutton.style.visibility = "hidden";
+            mybutton.style.opacity = "0";
+        }
+    };
+
+    function menu_on_scroll() {
+        localStorage.setItem("menu-scroll-position", document.getElementById('menu').scrollLeft);
+    }
+
+</script>
+<script>
+    document.getElementById("theme-toggle").addEventListener("click", () => {
+        if (document.body.className.includes("dark")) {
+            document.body.classList.remove('dark');
+            localStorage.setItem("pref-theme", 'light');
+        } else {
+            document.body.classList.add('dark');
+            localStorage.setItem("pref-theme", 'dark');
+        }
+    })
+
+</script>
+
+</body>
+
+</html>

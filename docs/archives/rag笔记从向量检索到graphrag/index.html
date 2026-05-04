@@ -1,0 +1,476 @@
+<!DOCTYPE html>
+<html lang="en" dir="auto">
+
+<head><meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<meta name="robots" content="index, follow">
+<title>RAG笔记：从向量检索到GraphRAG | oyzg&#39;s note</title>
+
+<meta name="keywords" content="LLM, RAG, GraphRAG, 向量检索, 知识库" />
+<meta name="description" content="整理RAG的工程流程：切分、向量化、召回、重排、上下文拼接、生成和GraphRAG。">
+<meta name="author" content="">
+<link rel="canonical" href="https://oyzg.github.io/archives/rag%E7%AC%94%E8%AE%B0%E4%BB%8E%E5%90%91%E9%87%8F%E6%A3%80%E7%B4%A2%E5%88%B0graphrag/" />
+<link href="/assets/css/stylesheet.min.d597aab94c71b49b163b6ac67c7958079589ea1a0b7300e8a0014e1d2023b95e.css" integrity="sha256-1ZequUxxtJsWO2rGfHlYB5WJ6hoLcwDooAFOHSAjuV4=" rel="preload stylesheet"
+    as="style">
+
+<link rel="icon" href="https://oyzg.github.io/favicon.ico">
+<link rel="icon" type="image/png" sizes="16x16" href="https://oyzg.github.io/favicon-16x16.png">
+<link rel="icon" type="image/png" sizes="32x32" href="https://oyzg.github.io/favicon-32x32.png">
+<link rel="apple-touch-icon" href="https://oyzg.github.io/apple-touch-icon.png">
+<link rel="mask-icon" href="https://oyzg.github.io/safari-pinned-tab.svg">
+<meta name="theme-color" content="#2e2e33">
+<meta name="msapplication-TileColor" content="#2e2e33">
+<meta name="generator" content="Hugo 0.147.4">
+<link rel="alternate" hreflang="en" href="https://oyzg.github.io/archives/rag%E7%AC%94%E8%AE%B0%E4%BB%8E%E5%90%91%E9%87%8F%E6%A3%80%E7%B4%A2%E5%88%B0graphrag/" />
+
+
+
+<meta property="og:title" content="RAG笔记：从向量检索到GraphRAG" />
+<meta property="og:description" content="整理RAG的工程流程：切分、向量化、召回、重排、上下文拼接、生成和GraphRAG。" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://oyzg.github.io/archives/rag%E7%AC%94%E8%AE%B0%E4%BB%8E%E5%90%91%E9%87%8F%E6%A3%80%E7%B4%A2%E5%88%B0graphrag/" />
+<meta property="article:published_time" content="2025-11-09T20:00:00+08:00" />
+<meta property="article:modified_time" content="2025-11-09T20:00:00+08:00" />
+
+<meta name="twitter:card" content="summary"/>
+<meta name="twitter:title" content="RAG笔记：从向量检索到GraphRAG"/>
+<meta name="twitter:description" content="整理RAG的工程流程：切分、向量化、召回、重排、上下文拼接、生成和GraphRAG。"/>
+
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position":  1 ,
+      "name": "RAG笔记：从向量检索到GraphRAG",
+      "item": "https://oyzg.github.io/archives/rag%E7%AC%94%E8%AE%B0%E4%BB%8E%E5%90%91%E9%87%8F%E6%A3%80%E7%B4%A2%E5%88%B0graphrag/"
+    }
+  ]
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": "RAG笔记：从向量检索到GraphRAG",
+  "name": "RAG笔记：从向量检索到GraphRAG",
+  "description": "整理RAG的工程流程：切分、向量化、召回、重排、上下文拼接、生成和GraphRAG。",
+  "keywords": [
+    "LLM", "RAG", "GraphRAG", "向量检索", "知识库"
+  ],
+  "articleBody": "RAG笔记：从向量检索到GraphRAG RAG 的全称是 Retrieval-Augmented Generation。原始 RAG 论文是 2020 年的 Retrieval-Augmented Generation for Knowledge-Intensive NLP Tasks。这两年实际做知识库问答时，RAG 已经不只是一个论文方法，更像 LLM 应用里的基础工程模块。\n我的理解：RAG 不是为了让模型“更聪明”，而是为了让模型在回答时能拿到外部资料。模型负责理解和组织语言，检索系统负责把相关资料找出来。\n为什么需要RAG LLM 预训练参数里有很多知识，但这些知识有几个问题：\n不够新：训练截止后的信息不在参数里。 不够准：模型可能记错，也可能编造。 不够私有：公司文档、个人笔记、项目代码不在公开训练数据里。 不可追溯：直接生成的答案很难知道依据来自哪里。 RAG 的思路是：不要指望模型把所有知识都记在参数里，而是在回答前先查资料，把查到的内容作为上下文交给模型。\n基本流程：\n用户问题 -\u003e 查询改写 -\u003e 检索相关文档 -\u003e 重排 -\u003e 拼接上下文 -\u003e LLM生成回答 这样模型回答时至少有材料可依赖。如果答案需要引用某个项目文档、接口说明或论文段落，RAG 比纯模型生成更稳。\n文档切分 RAG 工程里第一步通常是文档切分。原始文档可能很长，不能直接全部塞进上下文，所以要切成 chunks。\n切分看起来简单，但实际很影响效果。\n切太大，召回粒度粗，一个 chunk 里可能混了很多主题，模型拿到后不容易聚焦。\n切太小，上下文不完整，召回到的片段可能缺少前后解释。\n常见切分方式：\n固定长度切分：实现简单，但容易切断语义。 按标题切分：适合 Markdown、文档站、论文。 按段落切分：语义比较自然。 滑动窗口切分：通过 overlap 保留上下文连续性。 我更倾向于先按文档结构切，再用 token 长度做兜底。比如 Markdown 就按标题层级切，代码文档按函数或类切，FAQ 按问答对切。\nEmbedding和向量库 切完 chunk 后，需要用 embedding 模型把文本转成向量。向量的目标是让语义相近的内容在向量空间里距离更近。\n用户查询也会转成向量，然后在向量库里找相似 chunk。\n这里有几个容易踩坑的点：\nembedding 模型要和语言匹配。中文、英文、代码、多语言场景差异很大。 文档和 query 的写法可能不一样。用户问的是问题，文档写的是陈述句。 只靠向量相似度可能召回不到关键词很强但语义表达不同的内容。 chunk 里 metadata 很重要，比如标题、路径、更新时间、权限。 向量库只是索引，不是完整答案系统。很多 RAG 效果差，不是因为向量库不行，而是 chunk、embedding、query、metadata 和 rerank 没做好。\nHybrid search 纯向量检索有时会漏掉精确词。比如查某个函数名、错误码、配置项，关键词匹配反而更可靠。\n所以很多工程系统会做 hybrid search：\n向量检索：适合语义相似。 BM25 / keyword search：适合精确词。 metadata filter：适合按项目、时间、权限过滤。 然后把不同召回结果合并，再进入 rerank。\n我现在比较认可 hybrid search。因为真实问题不全是自然语言问答，很多问题带有代码名、日志、报错、接口路径，这些信息不能只靠语义向量。\nRerank 召回阶段追求“不要漏”，rerank 阶段追求“排得准”。\n向量库可能先召回 top 50 或 top 100，再用 reranker 判断每个 chunk 和 query 的相关性，选出 top 5 或 top 10 交给 LLM。\nReranker 可以是 cross-encoder，也可以是 LLM 自己做排序。它通常比向量相似度更准，因为它能同时看 query 和 chunk 的完整文本。\nRAG 里经常出现一种问题：召回结果里确实有正确材料，但排在后面，最终没进入上下文。这种情况下，提升 rerank 往往比换大模型更有效。\n上下文拼接 把检索结果交给 LLM 前，还要组织上下文。\n常见做法是：\n保留来源标题和路径。 按相关性排序。 控制总 token 数。 对重复内容去重。 在 prompt 中要求基于资料回答。 上下文不是越多越好。塞太多材料会稀释注意力，也可能引入互相矛盾的信息。尤其是长文档问答，模型容易抓住不相关段落生成答案。\n我更喜欢把 RAG prompt 写得明确一点：\n根据下面资料回答。如果资料不足，就说明不足。 不要编造资料中没有的事实。 这不能完全消除幻觉，但能减少模型脱离材料自由发挥。\n评估 RAG 不能只靠主观感觉。比较重要的评估维度：\nRetrieval recall：正确材料有没有被召回。 Context precision：上下文里无关内容多不多。 Answer correctness：答案是否正确。 Faithfulness：答案是否忠于检索材料。 Citation accuracy：引用来源是否对应。 如果答案错，要拆开看是检索错、排序错、上下文组织错，还是模型生成错。\n这一点很关键。RAG 是一个链路，最后答案不好不一定是模型问题。很多时候是文档没切好，或者正确 chunk 没进上下文。\nGraphRAG GraphRAG 是 2024 年之后比较常见的思路。它不是只把文档切成独立 chunk，而是从文本中抽取实体和关系，构建知识图谱，再用图结构帮助检索和总结。\n普通向量 RAG 更擅长回答局部问题，比如“某个配置怎么写”。GraphRAG 更适合跨文档、跨实体的全局问题，比如“这个项目里有哪些核心模块，它们如何依赖”“某个主题下不同文档的观点关系是什么”。\nGraphRAG 大致会做几件事：\n从文档中抽取实体。 抽取实体之间的关系。 构建社区或主题簇。 对社区生成摘要。 查询时结合图结构和文本片段回答。 它的优势是能把散落在文档里的信息组织起来。缺点也明显：构图成本高，抽取会有错误，更新也更复杂。\n所以我不会把 GraphRAG 当作普通 RAG 的完全替代。它更适合知识密集、关系复杂、需要全局总结的场景。\nRAG和Agent 普通 RAG 通常是一次检索一次回答。Agentic RAG 会更进一步，让模型自己决定是否继续查、换关键词查、打开哪个工具、比较多个来源。\n这种方式更像搜索过程：\n提出问题 -\u003e 搜索 -\u003e 阅读 -\u003e 判断是否足够 -\u003e 继续搜索 -\u003e 汇总回答 优点是复杂问题上更灵活。缺点是成本更高，延迟更长，也更容易跑偏。所以 Agentic RAG 需要更强的状态管理和停止条件。\n记录 RAG 的核心不只是“向量库 + LLM”。真正要做稳，需要把切分、召回、重排、上下文拼接、生成约束和评估串起来。\n我目前会这样理解：\n向量检索解决语义召回。 关键词检索补精确匹配。 Rerank 决定哪些材料真正进入上下文。 Prompt 约束模型基于资料回答。 GraphRAG 补结构化和全局关系。 RAG 本质上是在给 LLM 补外部知识边界。模型不用记住全部事实，但回答时必须能查到、读到、引用到。\n参考 Retrieval-Augmented Generation for Knowledge-Intensive NLP Tasks Dense Passage Retrieval for Open-Domain Question Answering REALM: Retrieval-Augmented Language Model Pre-Training From Local to Global: A Graph RAG Approach to Query-Focused Summarization Microsoft GraphRAG ",
+  "wordCount" : "279",
+  "inLanguage": "en",
+  "datePublished": "2025-11-09T20:00:00+08:00",
+  "dateModified": "2025-11-09T20:00:00+08:00",
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id": "https://oyzg.github.io/archives/rag%E7%AC%94%E8%AE%B0%E4%BB%8E%E5%90%91%E9%87%8F%E6%A3%80%E7%B4%A2%E5%88%B0graphrag/"
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "oyzg's note",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "https://oyzg.github.io/favicon.ico"
+    }
+  }
+}
+</script>
+
+
+
+
+
+</head>
+
+<body class="" id="top">
+<script>
+    if (localStorage.getItem("pref-theme") === "dark") {
+        document.body.classList.add('dark');
+    } else if (localStorage.getItem("pref-theme") === "light") {
+        document.body.classList.remove('dark')
+    } else if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+        document.body.classList.add('dark');
+    }
+
+</script>
+<noscript>
+    <style type="text/css">
+        #theme-toggle,
+        .top-link {
+            display: none;
+        }
+
+    </style>
+</noscript>
+<header class="header">
+    <nav class="nav">
+        <div class="logo">
+            <a href="https://oyzg.github.io/" accesskey="h" title="oyzg&#39;s note (Alt + H)">oyzg&#39;s note</a>
+            <span class="logo-switches">
+                <button id="theme-toggle" accesskey="t" title="(Alt + T)">
+                    <svg id="moon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                    </svg>
+                    <svg id="sun" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="5"></circle>
+                        <line x1="12" y1="1" x2="12" y2="3"></line>
+                        <line x1="12" y1="21" x2="12" y2="23"></line>
+                        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                        <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                        <line x1="1" y1="12" x2="3" y2="12"></line>
+                        <line x1="21" y1="12" x2="23" y2="12"></line>
+                        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                        <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+                    </svg>
+                </button>
+                
+                
+
+                <ul class="lang-switch"><li>|</li>
+                </ul>
+            </span>
+        </div>
+        <ul id="menu" onscroll="menu_on_scroll()">
+            <li>
+                <a href="https://oyzg.github.io/archives/" title="Archive">
+                    <span>Archive</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://oyzg.github.io/categories/" title="Categories">
+                    <span>Categories</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://oyzg.github.io/series/" title="Series">
+                    <span>Series</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://oyzg.github.io/tags/" title="Tags">
+                    <span>Tags</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://oyzg.github.io/search/" title="Search (Alt &#43; /)" accesskey=/>
+                    <span>Search</span>
+                </a>
+            </li></ul>
+    </nav>
+</header>
+
+    <main class="main">
+
+<article class="post-single">
+  <header class="post-header">
+
+    <h1 class="post-title">
+      RAG笔记：从向量检索到GraphRAG
+    </h1>
+    <div class="post-meta">November 9, 2025 · 2 min
+
+</div>
+  </header> 
+
+  <div class="toc">
+    <details >
+      <summary accesskey="c" title="(Alt + C)">
+        <div class="details">Table of Contents</div>
+      </summary>
+      <div class="inner"><ul><li>
+        <a href="#rag%e7%ac%94%e8%ae%b0%e4%bb%8e%e5%90%91%e9%87%8f%e6%a3%80%e7%b4%a2%e5%88%b0graphrag" aria-label="RAG笔记：从向量检索到GraphRAG">RAG笔记：从向量检索到GraphRAG</a><ul>
+            <li>
+        <a href="#%e4%b8%ba%e4%bb%80%e4%b9%88%e9%9c%80%e8%a6%81rag" aria-label="为什么需要RAG">为什么需要RAG</a></li><li>
+        <a href="#%e6%96%87%e6%a1%a3%e5%88%87%e5%88%86" aria-label="文档切分">文档切分</a></li><li>
+        <a href="#embedding%e5%92%8c%e5%90%91%e9%87%8f%e5%ba%93" aria-label="Embedding和向量库">Embedding和向量库</a></li><li>
+        <a href="#hybrid-search" aria-label="Hybrid search">Hybrid search</a></li><li>
+        <a href="#rerank" aria-label="Rerank">Rerank</a></li><li>
+        <a href="#%e4%b8%8a%e4%b8%8b%e6%96%87%e6%8b%bc%e6%8e%a5" aria-label="上下文拼接">上下文拼接</a></li><li>
+        <a href="#%e8%af%84%e4%bc%b0" aria-label="评估">评估</a></li><li>
+        <a href="#graphrag" aria-label="GraphRAG">GraphRAG</a></li><li>
+        <a href="#rag%e5%92%8cagent" aria-label="RAG和Agent">RAG和Agent</a></li><li>
+        <a href="#%e8%ae%b0%e5%bd%95" aria-label="记录">记录</a></li><li>
+        <a href="#%e5%8f%82%e8%80%83" aria-label="参考">参考</a></li></ul>
+</li></ul>
+      </div>
+    </details>
+  </div>
+  <div class="post-content">
+    
+<h1 id="rag笔记从向量检索到graphrag">RAG笔记：从向量检索到GraphRAG<a hidden class="anchor" aria-hidden="true" href="#rag笔记从向量检索到graphrag">#</a></h1>
+<p>RAG 的全称是 Retrieval-Augmented Generation。原始 RAG 论文是 2020 年的 <em>Retrieval-Augmented Generation for Knowledge-Intensive NLP Tasks</em>。这两年实际做知识库问答时，RAG 已经不只是一个论文方法，更像 LLM 应用里的基础工程模块。</p>
+<p>我的理解：RAG 不是为了让模型“更聪明”，而是为了让模型在回答时能拿到外部资料。模型负责理解和组织语言，检索系统负责把相关资料找出来。</p>
+<h2 id="为什么需要rag">为什么需要RAG<a hidden class="anchor" aria-hidden="true" href="#为什么需要rag">#</a></h2>
+<p>LLM 预训练参数里有很多知识，但这些知识有几个问题：</p>
+<ul>
+<li>不够新：训练截止后的信息不在参数里。</li>
+<li>不够准：模型可能记错，也可能编造。</li>
+<li>不够私有：公司文档、个人笔记、项目代码不在公开训练数据里。</li>
+<li>不可追溯：直接生成的答案很难知道依据来自哪里。</li>
+</ul>
+<p>RAG 的思路是：不要指望模型把所有知识都记在参数里，而是在回答前先查资料，把查到的内容作为上下文交给模型。</p>
+<p>基本流程：</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-text" data-lang="text"><span style="display:flex;"><span>用户问题 -&gt; 查询改写 -&gt; 检索相关文档 -&gt; 重排 -&gt; 拼接上下文 -&gt; LLM生成回答
+</span></span></code></pre></div><p>这样模型回答时至少有材料可依赖。如果答案需要引用某个项目文档、接口说明或论文段落，RAG 比纯模型生成更稳。</p>
+<h2 id="文档切分">文档切分<a hidden class="anchor" aria-hidden="true" href="#文档切分">#</a></h2>
+<p>RAG 工程里第一步通常是文档切分。原始文档可能很长，不能直接全部塞进上下文，所以要切成 chunks。</p>
+<p>切分看起来简单，但实际很影响效果。</p>
+<p>切太大，召回粒度粗，一个 chunk 里可能混了很多主题，模型拿到后不容易聚焦。</p>
+<p>切太小，上下文不完整，召回到的片段可能缺少前后解释。</p>
+<p>常见切分方式：</p>
+<ul>
+<li>固定长度切分：实现简单，但容易切断语义。</li>
+<li>按标题切分：适合 Markdown、文档站、论文。</li>
+<li>按段落切分：语义比较自然。</li>
+<li>滑动窗口切分：通过 overlap 保留上下文连续性。</li>
+</ul>
+<p>我更倾向于先按文档结构切，再用 token 长度做兜底。比如 Markdown 就按标题层级切，代码文档按函数或类切，FAQ 按问答对切。</p>
+<h2 id="embedding和向量库">Embedding和向量库<a hidden class="anchor" aria-hidden="true" href="#embedding和向量库">#</a></h2>
+<p>切完 chunk 后，需要用 embedding 模型把文本转成向量。向量的目标是让语义相近的内容在向量空间里距离更近。</p>
+<p>用户查询也会转成向量，然后在向量库里找相似 chunk。</p>
+<p>这里有几个容易踩坑的点：</p>
+<ul>
+<li>embedding 模型要和语言匹配。中文、英文、代码、多语言场景差异很大。</li>
+<li>文档和 query 的写法可能不一样。用户问的是问题，文档写的是陈述句。</li>
+<li>只靠向量相似度可能召回不到关键词很强但语义表达不同的内容。</li>
+<li>chunk 里 metadata 很重要，比如标题、路径、更新时间、权限。</li>
+</ul>
+<p>向量库只是索引，不是完整答案系统。很多 RAG 效果差，不是因为向量库不行，而是 chunk、embedding、query、metadata 和 rerank 没做好。</p>
+<h2 id="hybrid-search">Hybrid search<a hidden class="anchor" aria-hidden="true" href="#hybrid-search">#</a></h2>
+<p>纯向量检索有时会漏掉精确词。比如查某个函数名、错误码、配置项，关键词匹配反而更可靠。</p>
+<p>所以很多工程系统会做 hybrid search：</p>
+<ul>
+<li>向量检索：适合语义相似。</li>
+<li>BM25 / keyword search：适合精确词。</li>
+<li>metadata filter：适合按项目、时间、权限过滤。</li>
+</ul>
+<p>然后把不同召回结果合并，再进入 rerank。</p>
+<p>我现在比较认可 hybrid search。因为真实问题不全是自然语言问答，很多问题带有代码名、日志、报错、接口路径，这些信息不能只靠语义向量。</p>
+<h2 id="rerank">Rerank<a hidden class="anchor" aria-hidden="true" href="#rerank">#</a></h2>
+<p>召回阶段追求“不要漏”，rerank 阶段追求“排得准”。</p>
+<p>向量库可能先召回 top 50 或 top 100，再用 reranker 判断每个 chunk 和 query 的相关性，选出 top 5 或 top 10 交给 LLM。</p>
+<p>Reranker 可以是 cross-encoder，也可以是 LLM 自己做排序。它通常比向量相似度更准，因为它能同时看 query 和 chunk 的完整文本。</p>
+<p>RAG 里经常出现一种问题：召回结果里确实有正确材料，但排在后面，最终没进入上下文。这种情况下，提升 rerank 往往比换大模型更有效。</p>
+<h2 id="上下文拼接">上下文拼接<a hidden class="anchor" aria-hidden="true" href="#上下文拼接">#</a></h2>
+<p>把检索结果交给 LLM 前，还要组织上下文。</p>
+<p>常见做法是：</p>
+<ul>
+<li>保留来源标题和路径。</li>
+<li>按相关性排序。</li>
+<li>控制总 token 数。</li>
+<li>对重复内容去重。</li>
+<li>在 prompt 中要求基于资料回答。</li>
+</ul>
+<p>上下文不是越多越好。塞太多材料会稀释注意力，也可能引入互相矛盾的信息。尤其是长文档问答，模型容易抓住不相关段落生成答案。</p>
+<p>我更喜欢把 RAG prompt 写得明确一点：</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-text" data-lang="text"><span style="display:flex;"><span>根据下面资料回答。如果资料不足，就说明不足。
+</span></span><span style="display:flex;"><span>不要编造资料中没有的事实。
+</span></span></code></pre></div><p>这不能完全消除幻觉，但能减少模型脱离材料自由发挥。</p>
+<h2 id="评估">评估<a hidden class="anchor" aria-hidden="true" href="#评估">#</a></h2>
+<p>RAG 不能只靠主观感觉。比较重要的评估维度：</p>
+<ul>
+<li>Retrieval recall：正确材料有没有被召回。</li>
+<li>Context precision：上下文里无关内容多不多。</li>
+<li>Answer correctness：答案是否正确。</li>
+<li>Faithfulness：答案是否忠于检索材料。</li>
+<li>Citation accuracy：引用来源是否对应。</li>
+</ul>
+<p>如果答案错，要拆开看是检索错、排序错、上下文组织错，还是模型生成错。</p>
+<p>这一点很关键。RAG 是一个链路，最后答案不好不一定是模型问题。很多时候是文档没切好，或者正确 chunk 没进上下文。</p>
+<h2 id="graphrag">GraphRAG<a hidden class="anchor" aria-hidden="true" href="#graphrag">#</a></h2>
+<p>GraphRAG 是 2024 年之后比较常见的思路。它不是只把文档切成独立 chunk，而是从文本中抽取实体和关系，构建知识图谱，再用图结构帮助检索和总结。</p>
+<p>普通向量 RAG 更擅长回答局部问题，比如“某个配置怎么写”。GraphRAG 更适合跨文档、跨实体的全局问题，比如“这个项目里有哪些核心模块，它们如何依赖”“某个主题下不同文档的观点关系是什么”。</p>
+<p>GraphRAG 大致会做几件事：</p>
+<ul>
+<li>从文档中抽取实体。</li>
+<li>抽取实体之间的关系。</li>
+<li>构建社区或主题簇。</li>
+<li>对社区生成摘要。</li>
+<li>查询时结合图结构和文本片段回答。</li>
+</ul>
+<p>它的优势是能把散落在文档里的信息组织起来。缺点也明显：构图成本高，抽取会有错误，更新也更复杂。</p>
+<p>所以我不会把 GraphRAG 当作普通 RAG 的完全替代。它更适合知识密集、关系复杂、需要全局总结的场景。</p>
+<h2 id="rag和agent">RAG和Agent<a hidden class="anchor" aria-hidden="true" href="#rag和agent">#</a></h2>
+<p>普通 RAG 通常是一次检索一次回答。Agentic RAG 会更进一步，让模型自己决定是否继续查、换关键词查、打开哪个工具、比较多个来源。</p>
+<p>这种方式更像搜索过程：</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-text" data-lang="text"><span style="display:flex;"><span>提出问题 -&gt; 搜索 -&gt; 阅读 -&gt; 判断是否足够 -&gt; 继续搜索 -&gt; 汇总回答
+</span></span></code></pre></div><p>优点是复杂问题上更灵活。缺点是成本更高，延迟更长，也更容易跑偏。所以 Agentic RAG 需要更强的状态管理和停止条件。</p>
+<h2 id="记录">记录<a hidden class="anchor" aria-hidden="true" href="#记录">#</a></h2>
+<p>RAG 的核心不只是“向量库 + LLM”。真正要做稳，需要把切分、召回、重排、上下文拼接、生成约束和评估串起来。</p>
+<p>我目前会这样理解：</p>
+<ul>
+<li>向量检索解决语义召回。</li>
+<li>关键词检索补精确匹配。</li>
+<li>Rerank 决定哪些材料真正进入上下文。</li>
+<li>Prompt 约束模型基于资料回答。</li>
+<li>GraphRAG 补结构化和全局关系。</li>
+</ul>
+<p>RAG 本质上是在给 LLM 补外部知识边界。模型不用记住全部事实，但回答时必须能查到、读到、引用到。</p>
+<h2 id="参考">参考<a hidden class="anchor" aria-hidden="true" href="#参考">#</a></h2>
+<ul>
+<li><a href="https://arxiv.org/abs/2005.11401">Retrieval-Augmented Generation for Knowledge-Intensive NLP Tasks</a></li>
+<li><a href="https://arxiv.org/abs/2004.04906">Dense Passage Retrieval for Open-Domain Question Answering</a></li>
+<li><a href="https://arxiv.org/abs/2002.08909">REALM: Retrieval-Augmented Language Model Pre-Training</a></li>
+<li><a href="https://arxiv.org/abs/2404.16130">From Local to Global: A Graph RAG Approach to Query-Focused Summarization</a></li>
+<li><a href="https://github.com/microsoft/graphrag">Microsoft GraphRAG</a></li>
+</ul>
+
+</div>
+  <footer class="post-footer">
+    <ul class="post-tags">
+      <li><a href="https://oyzg.github.io/tags/llm/">LLM</a></li>
+      <li><a href="https://oyzg.github.io/tags/rag/">RAG</a></li>
+      <li><a href="https://oyzg.github.io/tags/graphrag/">GraphRAG</a></li>
+      <li><a href="https://oyzg.github.io/tags/%E5%90%91%E9%87%8F%E6%A3%80%E7%B4%A2/">向量检索</a></li>
+      <li><a href="https://oyzg.github.io/tags/%E7%9F%A5%E8%AF%86%E5%BA%93/">知识库</a></li>
+    </ul>
+    <nav class="paginav">
+      <a class="prev" href="https://oyzg.github.io/archives/agent%E7%AC%94%E8%AE%B0react%E5%B7%A5%E5%85%B7%E8%B0%83%E7%94%A8%E5%92%8C%E4%BB%BB%E5%8A%A1%E5%BE%AA%E7%8E%AF/">
+        <span class="title">« Prev Page</span>
+        <br>
+        <span>Agent笔记：ReAct、工具调用和任务循环</span>
+      </a>
+      <a class="next" href="https://oyzg.github.io/archives/redis/">
+        <span class="title">Next Page »</span>
+        <br>
+        <span>Redis</span>
+      </a>
+    </nav>
+
+
+
+
+
+
+<div class="share-buttons">
+    <a target="_blank" rel="noopener noreferrer" aria-label="share RAG笔记：从向量检索到GraphRAG on twitter"
+        href="https://twitter.com/intent/tweet/?text=RAG%e7%ac%94%e8%ae%b0%ef%bc%9a%e4%bb%8e%e5%90%91%e9%87%8f%e6%a3%80%e7%b4%a2%e5%88%b0GraphRAG&amp;url=https%3a%2f%2foyzg.github.io%2farchives%2frag%25E7%25AC%2594%25E8%25AE%25B0%25E4%25BB%258E%25E5%2590%2591%25E9%2587%258F%25E6%25A3%2580%25E7%25B4%25A2%25E5%2588%25B0graphrag%2f&amp;hashtags=LLM%2cRAG%2cGraphRAG%2c%e5%90%91%e9%87%8f%e6%a3%80%e7%b4%a2%2c%e7%9f%a5%e8%af%86%e5%ba%93">
+        <svg version="1.1" viewBox="0 0 512 512" xml:space="preserve">
+            <path
+                d="M449.446,0c34.525,0 62.554,28.03 62.554,62.554l0,386.892c0,34.524 -28.03,62.554 -62.554,62.554l-386.892,0c-34.524,0 -62.554,-28.03 -62.554,-62.554l0,-386.892c0,-34.524 28.029,-62.554 62.554,-62.554l386.892,0Zm-253.927,424.544c135.939,0 210.268,-112.643 210.268,-210.268c0,-3.218 0,-6.437 -0.153,-9.502c14.406,-10.421 26.973,-23.448 36.935,-38.314c-13.18,5.824 -27.433,9.809 -42.452,11.648c15.326,-9.196 26.973,-23.602 32.49,-40.92c-14.252,8.429 -30.038,14.56 -46.896,17.931c-13.487,-14.406 -32.644,-23.295 -53.946,-23.295c-40.767,0 -73.87,33.104 -73.87,73.87c0,5.824 0.613,11.494 1.992,16.858c-61.456,-3.065 -115.862,-32.49 -152.337,-77.241c-6.284,10.881 -9.962,23.601 -9.962,37.088c0,25.594 13.027,48.276 32.95,61.456c-12.107,-0.307 -23.448,-3.678 -33.41,-9.196l0,0.92c0,35.862 25.441,65.594 59.311,72.49c-6.13,1.686 -12.72,2.606 -19.464,2.606c-4.751,0 -9.348,-0.46 -13.946,-1.38c9.349,29.426 36.628,50.728 68.965,51.341c-25.287,19.771 -57.164,31.571 -91.8,31.571c-5.977,0 -11.801,-0.306 -17.625,-1.073c32.337,21.15 71.264,33.41 112.95,33.41Z" />
+        </svg>
+    </a>
+    <a target="_blank" rel="noopener noreferrer" aria-label="share RAG笔记：从向量检索到GraphRAG on linkedin"
+        href="https://www.linkedin.com/shareArticle?mini=true&amp;url=https%3a%2f%2foyzg.github.io%2farchives%2frag%25E7%25AC%2594%25E8%25AE%25B0%25E4%25BB%258E%25E5%2590%2591%25E9%2587%258F%25E6%25A3%2580%25E7%25B4%25A2%25E5%2588%25B0graphrag%2f&amp;title=RAG%e7%ac%94%e8%ae%b0%ef%bc%9a%e4%bb%8e%e5%90%91%e9%87%8f%e6%a3%80%e7%b4%a2%e5%88%b0GraphRAG&amp;summary=RAG%e7%ac%94%e8%ae%b0%ef%bc%9a%e4%bb%8e%e5%90%91%e9%87%8f%e6%a3%80%e7%b4%a2%e5%88%b0GraphRAG&amp;source=https%3a%2f%2foyzg.github.io%2farchives%2frag%25E7%25AC%2594%25E8%25AE%25B0%25E4%25BB%258E%25E5%2590%2591%25E9%2587%258F%25E6%25A3%2580%25E7%25B4%25A2%25E5%2588%25B0graphrag%2f">
+        <svg version="1.1" viewBox="0 0 512 512" xml:space="preserve">
+            <path
+                d="M449.446,0c34.525,0 62.554,28.03 62.554,62.554l0,386.892c0,34.524 -28.03,62.554 -62.554,62.554l-386.892,0c-34.524,0 -62.554,-28.03 -62.554,-62.554l0,-386.892c0,-34.524 28.029,-62.554 62.554,-62.554l386.892,0Zm-288.985,423.278l0,-225.717l-75.04,0l0,225.717l75.04,0Zm270.539,0l0,-129.439c0,-69.333 -37.018,-101.586 -86.381,-101.586c-39.804,0 -57.634,21.891 -67.617,37.266l0,-31.958l-75.021,0c0.995,21.181 0,225.717 0,225.717l75.02,0l0,-126.056c0,-6.748 0.486,-13.492 2.474,-18.315c5.414,-13.475 17.767,-27.434 38.494,-27.434c27.135,0 38.007,20.707 38.007,51.037l0,120.768l75.024,0Zm-307.552,-334.556c-25.674,0 -42.448,16.879 -42.448,39.002c0,21.658 16.264,39.002 41.455,39.002l0.484,0c26.165,0 42.452,-17.344 42.452,-39.002c-0.485,-22.092 -16.241,-38.954 -41.943,-39.002Z" />
+        </svg>
+    </a>
+    <a target="_blank" rel="noopener noreferrer" aria-label="share RAG笔记：从向量检索到GraphRAG on reddit"
+        href="https://reddit.com/submit?url=https%3a%2f%2foyzg.github.io%2farchives%2frag%25E7%25AC%2594%25E8%25AE%25B0%25E4%25BB%258E%25E5%2590%2591%25E9%2587%258F%25E6%25A3%2580%25E7%25B4%25A2%25E5%2588%25B0graphrag%2f&title=RAG%e7%ac%94%e8%ae%b0%ef%bc%9a%e4%bb%8e%e5%90%91%e9%87%8f%e6%a3%80%e7%b4%a2%e5%88%b0GraphRAG">
+        <svg version="1.1" viewBox="0 0 512 512" xml:space="preserve">
+            <path
+                d="M449.446,0c34.525,0 62.554,28.03 62.554,62.554l0,386.892c0,34.524 -28.03,62.554 -62.554,62.554l-386.892,0c-34.524,0 -62.554,-28.03 -62.554,-62.554l0,-386.892c0,-34.524 28.029,-62.554 62.554,-62.554l386.892,0Zm-3.446,265.638c0,-22.964 -18.616,-41.58 -41.58,-41.58c-11.211,0 -21.361,4.457 -28.841,11.666c-28.424,-20.508 -67.586,-33.757 -111.204,-35.278l18.941,-89.121l61.884,13.157c0.756,15.734 13.642,28.29 29.56,28.29c16.407,0 29.706,-13.299 29.706,-29.701c0,-16.403 -13.299,-29.702 -29.706,-29.702c-11.666,0 -21.657,6.792 -26.515,16.578l-69.105,-14.69c-1.922,-0.418 -3.939,-0.042 -5.585,1.036c-1.658,1.073 -2.811,2.761 -3.224,4.686l-21.152,99.438c-44.258,1.228 -84.046,14.494 -112.837,35.232c-7.468,-7.164 -17.589,-11.591 -28.757,-11.591c-22.965,0 -41.585,18.616 -41.585,41.58c0,16.896 10.095,31.41 24.568,37.918c-0.639,4.135 -0.99,8.328 -0.99,12.576c0,63.977 74.469,115.836 166.33,115.836c91.861,0 166.334,-51.859 166.334,-115.836c0,-4.218 -0.347,-8.387 -0.977,-12.493c14.564,-6.47 24.735,-21.034 24.735,-38.001Zm-119.474,108.193c-20.27,20.241 -59.115,21.816 -70.534,21.816c-11.428,0 -50.277,-1.575 -70.522,-21.82c-3.007,-3.008 -3.007,-7.882 0,-10.889c3.003,-2.999 7.882,-3.003 10.885,0c12.777,12.781 40.11,17.317 59.637,17.317c19.522,0 46.86,-4.536 59.657,-17.321c3.016,-2.999 7.886,-2.995 10.885,0.008c3.008,3.011 3.003,7.882 -0.008,10.889Zm-5.23,-48.781c-16.373,0 -29.701,-13.324 -29.701,-29.698c0,-16.381 13.328,-29.714 29.701,-29.714c16.378,0 29.706,13.333 29.706,29.714c0,16.374 -13.328,29.698 -29.706,29.698Zm-160.386,-29.702c0,-16.381 13.328,-29.71 29.714,-29.71c16.369,0 29.689,13.329 29.689,29.71c0,16.373 -13.32,29.693 -29.689,29.693c-16.386,0 -29.714,-13.32 -29.714,-29.693Z" />
+        </svg>
+    </a>
+    <a target="_blank" rel="noopener noreferrer" aria-label="share RAG笔记：从向量检索到GraphRAG on facebook"
+        href="https://facebook.com/sharer/sharer.php?u=https%3a%2f%2foyzg.github.io%2farchives%2frag%25E7%25AC%2594%25E8%25AE%25B0%25E4%25BB%258E%25E5%2590%2591%25E9%2587%258F%25E6%25A3%2580%25E7%25B4%25A2%25E5%2588%25B0graphrag%2f">
+        <svg version="1.1" viewBox="0 0 512 512" xml:space="preserve">
+            <path
+                d="M449.446,0c34.525,0 62.554,28.03 62.554,62.554l0,386.892c0,34.524 -28.03,62.554 -62.554,62.554l-106.468,0l0,-192.915l66.6,0l12.672,-82.621l-79.272,0l0,-53.617c0,-22.603 11.073,-44.636 46.58,-44.636l36.042,0l0,-70.34c0,0 -32.71,-5.582 -63.982,-5.582c-65.288,0 -107.96,39.569 -107.96,111.204l0,62.971l-72.573,0l0,82.621l72.573,0l0,192.915l-191.104,0c-34.524,0 -62.554,-28.03 -62.554,-62.554l0,-386.892c0,-34.524 28.029,-62.554 62.554,-62.554l386.892,0Z" />
+        </svg>
+    </a>
+    <a target="_blank" rel="noopener noreferrer" aria-label="share RAG笔记：从向量检索到GraphRAG on whatsapp"
+        href="https://api.whatsapp.com/send?text=RAG%e7%ac%94%e8%ae%b0%ef%bc%9a%e4%bb%8e%e5%90%91%e9%87%8f%e6%a3%80%e7%b4%a2%e5%88%b0GraphRAG%20-%20https%3a%2f%2foyzg.github.io%2farchives%2frag%25E7%25AC%2594%25E8%25AE%25B0%25E4%25BB%258E%25E5%2590%2591%25E9%2587%258F%25E6%25A3%2580%25E7%25B4%25A2%25E5%2588%25B0graphrag%2f">
+        <svg version="1.1" viewBox="0 0 512 512" xml:space="preserve">
+            <path
+                d="M449.446,0c34.525,0 62.554,28.03 62.554,62.554l0,386.892c0,34.524 -28.03,62.554 -62.554,62.554l-386.892,0c-34.524,0 -62.554,-28.03 -62.554,-62.554l0,-386.892c0,-34.524 28.029,-62.554 62.554,-62.554l386.892,0Zm-58.673,127.703c-33.842,-33.881 -78.847,-52.548 -126.798,-52.568c-98.799,0 -179.21,80.405 -179.249,179.234c-0.013,31.593 8.241,62.428 23.927,89.612l-25.429,92.884l95.021,-24.925c26.181,14.28 55.659,21.807 85.658,21.816l0.074,0c98.789,0 179.206,-80.413 179.247,-179.243c0.018,-47.895 -18.61,-92.93 -52.451,-126.81Zm-126.797,275.782l-0.06,0c-26.734,-0.01 -52.954,-7.193 -75.828,-20.767l-5.441,-3.229l-56.386,14.792l15.05,-54.977l-3.542,-5.637c-14.913,-23.72 -22.791,-51.136 -22.779,-79.287c0.033,-82.142 66.867,-148.971 149.046,-148.971c39.793,0.014 77.199,15.531 105.329,43.692c28.128,28.16 43.609,65.592 43.594,105.4c-0.034,82.149 -66.866,148.983 -148.983,148.984Zm81.721,-111.581c-4.479,-2.242 -26.499,-13.075 -30.604,-14.571c-4.105,-1.495 -7.091,-2.241 -10.077,2.241c-2.986,4.483 -11.569,14.572 -14.182,17.562c-2.612,2.988 -5.225,3.364 -9.703,1.12c-4.479,-2.241 -18.91,-6.97 -36.017,-22.23c-13.314,-11.876 -22.304,-26.542 -24.916,-31.026c-2.612,-4.484 -0.279,-6.908 1.963,-9.14c2.016,-2.007 4.48,-5.232 6.719,-7.847c2.24,-2.615 2.986,-4.484 4.479,-7.472c1.493,-2.99 0.747,-5.604 -0.374,-7.846c-1.119,-2.241 -10.077,-24.288 -13.809,-33.256c-3.635,-8.733 -7.327,-7.55 -10.077,-7.688c-2.609,-0.13 -5.598,-0.158 -8.583,-0.158c-2.986,0 -7.839,1.121 -11.944,5.604c-4.105,4.484 -15.675,15.32 -15.675,37.364c0,22.046 16.048,43.342 18.287,46.332c2.24,2.99 31.582,48.227 76.511,67.627c10.685,4.615 19.028,7.371 25.533,9.434c10.728,3.41 20.492,2.929 28.209,1.775c8.605,-1.285 26.499,-10.833 30.231,-21.295c3.732,-10.464 3.732,-19.431 2.612,-21.298c-1.119,-1.869 -4.105,-2.99 -8.583,-5.232Z" />
+        </svg>
+    </a>
+    <a target="_blank" rel="noopener noreferrer" aria-label="share RAG笔记：从向量检索到GraphRAG on telegram"
+        href="https://telegram.me/share/url?text=RAG%e7%ac%94%e8%ae%b0%ef%bc%9a%e4%bb%8e%e5%90%91%e9%87%8f%e6%a3%80%e7%b4%a2%e5%88%b0GraphRAG&amp;url=https%3a%2f%2foyzg.github.io%2farchives%2frag%25E7%25AC%2594%25E8%25AE%25B0%25E4%25BB%258E%25E5%2590%2591%25E9%2587%258F%25E6%25A3%2580%25E7%25B4%25A2%25E5%2588%25B0graphrag%2f">
+        <svg version="1.1" xml:space="preserve" viewBox="2 2 28 28">
+            <path
+                d="M26.49,29.86H5.5a3.37,3.37,0,0,1-2.47-1,3.35,3.35,0,0,1-1-2.47V5.48A3.36,3.36,0,0,1,3,3,3.37,3.37,0,0,1,5.5,2h21A3.38,3.38,0,0,1,29,3a3.36,3.36,0,0,1,1,2.46V26.37a3.35,3.35,0,0,1-1,2.47A3.38,3.38,0,0,1,26.49,29.86Zm-5.38-6.71a.79.79,0,0,0,.85-.66L24.73,9.24a.55.55,0,0,0-.18-.46.62.62,0,0,0-.41-.17q-.08,0-16.53,6.11a.59.59,0,0,0-.41.59.57.57,0,0,0,.43.52l4,1.24,1.61,4.83a.62.62,0,0,0,.63.43.56.56,0,0,0,.4-.17L16.54,20l4.09,3A.9.9,0,0,0,21.11,23.15ZM13.8,20.71l-1.21-4q8.72-5.55,8.78-5.55c.15,0,.23,0,.23.16a.18.18,0,0,1,0,.06s-2.51,2.3-7.52,6.8Z" />
+        </svg>
+    </a>
+</div>
+
+  </footer>
+</article>
+    </main><footer class="footer">
+    <span>&copy; 2026 <a href="https://oyzg.github.io/">oyzg&#39;s note</a></span>
+    <span>&middot;</span>
+    <span>Powered by <a href="https://gohugo.io/" rel="noopener noreferrer" target="_blank">Hugo</a></span>
+    <span>&middot;</span>
+    <span>Theme <a href="https://git.io/hugopapermod" rel="noopener" target="_blank">PaperMod</a></span>
+</footer>
+<a href="#top" aria-label="go to top" title="Go to Top (Alt + G)">
+    <button class="top-link" id="top-link" type="button" accesskey="g">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 12 6" fill="currentColor">
+            <path d="M12 6H0l6-6z" />
+        </svg>
+    </button>
+</a>
+
+
+
+<script defer src="/assets/js/highlight.min.2eadbb982468c11a433a3e291f01326f2ba43f065e256bf792dbd79640a92316.js" integrity="sha256-Lq27mCRowRpDOj4pHwEybyukPwZeJWv3ktvXlkCpIxY="
+    onload="hljs.initHighlightingOnLoad();"></script>
+<script>
+    window.onload = function () {
+        if (localStorage.getItem("menu-scroll-position")) {
+            document.getElementById('menu').scrollLeft = localStorage.getItem("menu-scroll-position");
+        }
+    }
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener("click", function (e) {
+            e.preventDefault();
+            var id = this.getAttribute("href").substr(1);
+            if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView({
+                    behavior: "smooth"
+                });
+            } else {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView();
+            }
+            if (id === "top") {
+                history.replaceState(null, null, " ");
+            } else {
+                history.pushState(null, null, `#${id}`);
+            }
+        });
+    });
+    var mybutton = document.getElementById("top-link");
+    window.onscroll = function () {
+        if (document.body.scrollTop > 800 || document.documentElement.scrollTop > 800) {
+            mybutton.style.visibility = "visible";
+            mybutton.style.opacity = "1";
+        } else {
+            mybutton.style.visibility = "hidden";
+            mybutton.style.opacity = "0";
+        }
+    };
+
+    function menu_on_scroll() {
+        localStorage.setItem("menu-scroll-position", document.getElementById('menu').scrollLeft);
+    }
+
+</script>
+<script>
+    document.getElementById("theme-toggle").addEventListener("click", () => {
+        if (document.body.className.includes("dark")) {
+            document.body.classList.remove('dark');
+            localStorage.setItem("pref-theme", 'light');
+        } else {
+            document.body.classList.add('dark');
+            localStorage.setItem("pref-theme", 'dark');
+        }
+    })
+
+</script>
+
+</body>
+
+</html>

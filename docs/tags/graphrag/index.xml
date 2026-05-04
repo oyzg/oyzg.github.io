@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>GraphRAG on oyzg&#39;s note</title>
+    <link>https://oyzg.github.io/tags/graphrag/</link>
+    <description>Recent content in GraphRAG on oyzg&#39;s note</description>
+    <generator>Hugo</generator>
+    <language>en-us</language>
+    <lastBuildDate>Sun, 09 Nov 2025 20:00:00 +0800</lastBuildDate>
+    <atom:link href="https://oyzg.github.io/tags/graphrag/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>RAG笔记：从向量检索到GraphRAG</title>
+      <link>https://oyzg.github.io/archives/rag%E7%AC%94%E8%AE%B0%E4%BB%8E%E5%90%91%E9%87%8F%E6%A3%80%E7%B4%A2%E5%88%B0graphrag/</link>
+      <pubDate>Sun, 09 Nov 2025 20:00:00 +0800</pubDate>
+      <guid>https://oyzg.github.io/archives/rag%E7%AC%94%E8%AE%B0%E4%BB%8E%E5%90%91%E9%87%8F%E6%A3%80%E7%B4%A2%E5%88%B0graphrag/</guid>
+      <description>整理RAG的工程流程：切分、向量化、召回、重排、上下文拼接、生成和GraphRAG。</description>
+    </item>
+  </channel>
+</rss>

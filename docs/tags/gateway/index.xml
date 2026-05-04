@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Gateway on oyzg&#39;s note</title>
+    <link>https://oyzg.github.io/tags/gateway/</link>
+    <description>Recent content in Gateway on oyzg&#39;s note</description>
+    <generator>Hugo</generator>
+    <language>en-us</language>
+    <lastBuildDate>Sun, 29 Mar 2026 20:00:00 +0800</lastBuildDate>
+    <atom:link href="https://oyzg.github.io/tags/gateway/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>OpenClaw笔记：个人AI Agent的系统边界</title>
+      <link>https://oyzg.github.io/archives/openclaw%E7%AC%94%E8%AE%B0%E4%B8%AA%E4%BA%BAai-agent%E7%9A%84%E7%B3%BB%E7%BB%9F%E8%BE%B9%E7%95%8C/</link>
+      <pubDate>Sun, 29 Mar 2026 20:00:00 +0800</pubDate>
+      <guid>https://oyzg.github.io/archives/openclaw%E7%AC%94%E8%AE%B0%E4%B8%AA%E4%BA%BAai-agent%E7%9A%84%E7%B3%BB%E7%BB%9F%E8%BE%B9%E7%95%8C/</guid>
+      <description>整理OpenClaw这类个人Agent框架的系统结构：channel、gateway、tools、skills、MCP bridge和权限边界。</description>
+    </item>
+  </channel>
+</rss>
