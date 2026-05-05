@@ -4,11 +4,11 @@ date: 2026-02-08T20:00:00+08:00
 draft: false
 categories: [Agent]
 series: [LLM与Agent学习笔记]
-tags: [Agent, Skill, Claude, Codex, 工作流]
+tags: [Agent, Skill, Claude, 工作流]
 summary: "整理Skill的基本理解：它和prompt、RAG、MCP的区别，以及为什么适合沉淀可复用任务经验。"
 ---
 
-最近看 Agent 工具时，经常看到 Skill 这个概念。Claude 有 Skills，Codex 里也有技能机制，Hermes Agent 也强调从经验里创建和改进 skills。
+最近看 Agent 工具时，经常看到 Skill 这个概念。Claude 有 Skills，一些 Agent 工具也开始把可复用流程整理成类似的技能机制。
 
 我现在的理解：Skill 不是简单 prompt，也不是知识库，而是给 Agent 按需加载的一组任务经验。它可以包括说明、约束、脚本、模板、资源和工作流。
 
@@ -107,7 +107,7 @@ Skill 会告诉 Agent 在某类任务中怎么使用这些工具：
 - 可选脚本或模板。
 - 验证清单。
 
-在 Codex 的技能机制里，`SKILL.md` 通常是入口。Agent 先读技能说明，只在需要时再加载脚本、模板或参考文件。这种“渐进加载”很重要。
+在这类技能机制里，`SKILL.md` 通常是入口。Agent 先读技能说明，只在需要时再加载脚本、模板或参考文件。这种“渐进加载”很重要。
 
 如果一个 Skill 一上来就把所有资料全塞进上下文，反而失去意义。好的 Skill 应该先给最小必要说明，再按任务需要展开。
 
@@ -146,7 +146,7 @@ Skill 最大的价值是沉淀经验。
 
 这些规则沉淀成 Skill 后，Agent 下次遇到类似任务就能主动执行。
 
-这也是 Hermes Agent 自学习里 skills 的意义：把完成任务后的经验转成可复用技能，让系统越用越贴合用户。
+后面一些自学习 Agent 也会沿着类似方向走：把完成任务后的经验转成可复用技能，让系统越用越贴合用户。
 
 ## 风险
 
@@ -180,4 +180,3 @@ Skill 可以先理解成 Agent 的“经验包”。
 - [Claude Skills](https://support.claude.com/en/articles/12512176-what-are-skills)
 - [Anthropic: Equip Claude with new skills](https://www.anthropic.com/news/skills)
 - [Model Context Protocol Documentation](https://modelcontextprotocol.io/)
-- [Hermes Agent Documentation](https://hermes-agent.nousresearch.com/docs/)

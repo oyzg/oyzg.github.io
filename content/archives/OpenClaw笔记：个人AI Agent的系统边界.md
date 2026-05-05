@@ -162,4 +162,3 @@ channel -> gateway -> agent loop -> skills -> tools / MCP -> external systems
 - [OpenClaw GitHub](https://github.com/openclaw/openclaw)
 - [OpenClaw MCP Documentation](https://docs.openclaw.ai/cli/mcp)
 - [Model Context Protocol Documentation](https://modelcontextprotocol.io/)
-- [HermesClaw bridge discussion](https://github.com/NousResearch/hermes-agent)
